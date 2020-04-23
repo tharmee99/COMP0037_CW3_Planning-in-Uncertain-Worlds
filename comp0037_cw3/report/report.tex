@@ -101,17 +101,16 @@
 				\label{eq:waitTime}
 			\end{equation}
 
-			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from a exponential distribution with a rate parameter of $0.5\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. \ref{eq:waitTimePDF}. 
+			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from a exponential distribution with a rate parameter of $2\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. \ref{eq:waitTimePDF}. 
 
 			\begin{equation}
 				f(t) = 
 				\begin{cases}
-				\lambda e^{-\lambda t} & \quad t \geq 0 \\
+				2\lambda_{B} e^{-2\lambda_{B} t} & \quad t \geq 0 \\
 				0 & \quad t < 0
 				\end{cases}
 				\label{eq:waitTimePDF}
 			\end{equation}
-			where, $\lambda = \dfrac{0.5}{\lambda_{B}}$. 
 			
 			As previously mentioned, the robot has two options to choose from: to wait for the obstacle to clear, or to re-plan and execute the new path. The two are different policies the robot must choose from. We use the symbol $\pi$ to denote a policy. A policy is a mapping from the world state to an action the robot can execute.
 			\\
@@ -164,12 +163,11 @@
 				\begin{split}
 					\mathbb{E}\left[T\right] & = \mathbb{E}\left[\frac{0.5}{\lambda_{B}}+\widetilde{T}\right] \\
 					& = \frac{0.5}{\lambda_{B}} + \mathbb{E}\left[\widetilde{T}\right] \\
-					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}te^{\frac{0.5}{\lambda_{B}}t} dt \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\left(t\right) \left(e^{-\frac{0.5}{\lambda_{B}}t}\right) - \int_{0}^{\infty}e^{-\frac{0.5}{\lambda_{B}}t} dt \right]_{0}^{\infty}\\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{-\frac{0.5}{\lambda_{B}}t} - \left[-\frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]\right]_{0}^{\infty} \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{\frac{0.5}{\lambda_{B}}t} + \frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]_{0}^{\infty} \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\lim_{x \to +\infty} \left[-te^{0.5\lambda_{B}t} + \frac{\lambda_{B}}{0.5}e^{\frac{0.5}{\lambda_{B}}t}\right] - \frac{\lambda_{B}}{0.5}\right] \\
-					& = \frac{0.5}{\lambda_{B}} - \frac{\lambda_{B}}{0.5}\times \frac{0.5}{\lambda_{B}} = \frac{0.5}{\lambda_{B}}-1
+					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}2\lambda_{B}te^{-2\lambda_{B}t} dt \\
+					& = \frac{0.5}{\lambda_{B}} + 2\lambda_{B}\left[\left(t\right) \left(-\frac{1}{2\lambda_{B}}e^{-2\lambda_{B}t}\right) + \frac{1}{2\lambda_{B}} \int_{0}^{\infty}e^{-2\lambda_{B}t} dt \right]_{0}^{\infty} \\
+					& = \frac{0.5}{\lambda_{B}} + 2\lambda_{B}\left[\left(t\right) \left(-\frac{1}{2\lambda_{B}}e^{-2\lambda_{B}t}\right) - \left(\frac{1}{2\lambda_{B}}\right)^2 e^{-2\lambda_{B}t} \right]_{0}^{\infty} \\
+					& = \frac{0.5}{\lambda_{B}} - \left[te^{-2\lambda_{B}t} + \frac{1}{2\lambda_{B}} e^{-2\lambda_{B}t} \right]_{0}^{\infty} \\
+					& = \frac{0.5}{\lambda_{B}} - (0 + 0 - 0 - \frac{1}{2\lambda_{B}}) = \frac{0.5}{\lambda_{B}} + \frac{1}{2\lambda_{B}} = \frac{1}{\lambda_{B}}
 				\end{split}
 				\label{eq:waitTimeExpectation}
 			\end{equation}
@@ -178,9 +176,8 @@
 
 			\begin{equation}
 				\begin{split}
-					\frac{0.5}{\lambda_{B}}-1 & \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}{L_W} \\
-					\frac{0.5}{\lambda_{B}}& \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}+L_W}{L_W} \\
-					\lambda_{B} & \geq \frac{0.5L_W}{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}+L_W}
+					\frac{1}{\lambda_{B}} & \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}{L_W} \\	
+					\lambda_{B} & \geq \frac{L_W}{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}
 				\end{split}
 				\label{eq:lambdaInequality}
 			\end{equation}
