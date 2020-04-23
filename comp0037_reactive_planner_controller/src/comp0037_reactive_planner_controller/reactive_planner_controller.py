@@ -33,14 +33,14 @@ class ReactivePlannerController(PlannerControllerBase):
 
     def checkIfPathCurrentPathIsStillGood(self):
 
-        # This methods needs to check if the current path, whose
-        # waypoints are in self.currentPlannedPath, can still be
-        # traversed
-                
-        # If the route is not viable any more, call
-        # self.controller.stopDrivingToCurrentGoal()
+        tempSearchGrid = SearchGrid.fromOccupancyGrid(self.occupancyGrid, self.robotRadius)
 
-        pass
+        for waypointNumber in range(0,len(self.currentPlannedPath.waypoints)):
+            coords = self.currentPlannedPath.waypoints[waypointNumber].coords
+
+            if (tempSearchGrid.getCellFromCoords(coords).label == CellLabel.OBSTRUCTED):
+                self.controller.stopDrivingToCurrentGoal()
+                break
 
     # Choose the first aisle the robot will initially drive down.
     # This is based on the prior.
