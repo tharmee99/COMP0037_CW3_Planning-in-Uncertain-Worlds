@@ -186,6 +186,19 @@
 			\end{equation}
 
 		\subsection{Policy Selection at Start}
+			The cost to attempt going down aisle B:
+
+			\begin{equation}
+				\begin{split}
+				L(\pi_k^1) =L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}\\
+				L(\pi_k^2) = L_{IC}+L_{CG}\\
+				\mathbb{E}[L_{IB_1}+TL_W + L_{B_1B}+L{BC}+L{CG}] \geq \mathbb{E}[L_{IC}+L_{CG}]\\
+				\mathbb{E}[T]L_W \geq L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\\
+				\mathbb{E} \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}\\
+				\frac{0.5}{\lambda_B} \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}\\
+				\lambda_B \leq \frac{0.5L_W}{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}
+				\end{split}
+			\end{equation}
 
 		\subsection{Considering the Probability of the Obstacle Being Present}
 
