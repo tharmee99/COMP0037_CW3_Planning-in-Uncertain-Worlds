@@ -1,6 +1,6 @@
 # This base class defines the API of a class which wraps around the planner and
 # controller to produce reactive operations.
-
+import rospy
 from comp0037_reactive_planner_controller.aisle import Aisle
 
 class PlannerControllerBase(object):
@@ -9,7 +9,9 @@ class PlannerControllerBase(object):
         self.occupancyGrid = occupancyGrid
         self.planner = planner
         self.controller = controller
+
         self.currentPlannedPath = None
+        self.robotRadius = rospy.get_param('robot_radius', 0.2)
 
     def mapUpdateCallback(self, mapUpdateMessage):
         raise NotImplementedError()

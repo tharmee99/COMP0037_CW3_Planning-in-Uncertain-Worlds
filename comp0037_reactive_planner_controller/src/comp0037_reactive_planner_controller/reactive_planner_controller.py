@@ -6,7 +6,8 @@ import threading
 from cell import CellLabel
 from planner_controller_base import PlannerControllerBase
 from comp0037_mapper.msg import *
-from comp0037_reactive_planner_controller.aisle import Aisle
+from aisle import Aisle
+from search_grid import SearchGrid
 
 class ReactivePlannerController(PlannerControllerBase):
 
@@ -45,7 +46,7 @@ class ReactivePlannerController(PlannerControllerBase):
     # Choose the first aisle the robot will initially drive down.
     # This is based on the prior.
     def chooseInitialAisle(self, startCellCoords, goalCellCoords):
-        return Aisle.A
+        return Aisle.D
 
     # Choose the subdquent aisle the robot will drive down
     def chooseAisle(self, startCellCoords, goalCellCoords):
@@ -59,6 +60,19 @@ class ReactivePlannerController(PlannerControllerBase):
     def waitUntilTheObstacleClears(self):
         pass
     
+    def getAisleMidpoint(self, aisle):
+        if (aisle == Aisle.A):
+            return (6.25,9.375)
+        elif (aisle == Aisle.B):
+            return (10.5,9.375)
+        elif (aisle == Aisle.C):
+            return (14.75,9.375)
+        elif (aisle == Aisle.D):
+            return (18.5,9.375)
+        elif (aisle == Aisle.E):
+            return (22.5,9.375)
+
+
     # Plan a path to the goal which will go down the designated aisle. The code, as
     # currently implemented simply tries to drive from the start to the goal without
     # considering the aisle.
@@ -69,20 +83,30 @@ class ReactivePlannerController(PlannerControllerBase):
         if self.aisleToDriveDown is None:
             self.aisleToDriveDown = aisle
 
-        # Implement your method here to construct a path which will drive the robot
-        # from the start to the goal via the aisle.
-        pathToGoalFound = self.planner.search(startCellCoords, goalCellCoords)    
+        aisleWorldCoords = self.getAisleMidpoint(self.aisleToDriveDown)
+        aisleCellCoords = self.occupancyGrid.getCellCoordinatesFromWorldCoordinates(aisleWorldCoords)
 
-        # If we can't reach the goal, give up and return
-        if pathToGoalFound is False:
-            rospy.logwarn("Could not find a path to the goal at (%d, %d)", \
-                            goalCellCoords[0], goalCellCoords[1])
+        pathToAisleFound = self.planner.search(startCellCoords, aisleCellCoords)
+        if (pathToAisleFound is False):
+            rospy.logwarn("Could not find a path to the goal at (%d, %d) via Aisle %s", \
+                            goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
+        pathToAilse = self.planner.extractPathToGoal()
+
+
+        pathToGoalFound = self.planner.search(aisleCellCoords, goalCellCoords)    
+        if (pathToGoalFound is False):
+            rospy.logwarn("Could not find a path to the goal at (%d, %d) via Aisle %s", \
+                            goalCellCoords[0], goalCellCoords[1], aisle.name)
+            return None
+        pathToGoal = self.planner.extractPathToGoal()
+
 
         # Extract the path
-        currentPlannedPath = self.planner.extractPathToGoal()
-
-        return currentPlannedPath
+        pathToAilse.addToEnd(pathToGoal)
+        print(list(pathToAilse.waypoints)[0].coords)
+        print(list(pathToAilse.waypoints)[-1].coords)
+        return pathToAilse
 
     # This method drives the robot from the start to the final goal. It includes
     # choosing an aisle to drive down and both waiting and replanning behaviour.
