@@ -265,6 +265,51 @@
 
 		\subsection{Considering Multiple Obstacles}
 
+		There can be 4 cases:\\
+		 $\rightarrow$ Driving down to aisle B and waiting (\ref{eqn:aisleBAndWaiting})
+		\begin{equation}
+			\begin{split}
+			L_{IB_1}+V_WT_B+L_{B_1V}+L_{BC}+L_{CG}
+			\end{split}
+			\label{eqn:aisleBAndWaiting}
+			\end{equation}
+		$\rightarrow$ Driving down to aisle B encountering an obstacle, driving down aisle C (\ref{eqn:aisleBAndDownC})
+		\begin{equation}
+			\begin{split}
+			L_{IB_1}+L_{B_1C}+L_{CG}
+			\end{split}
+			\label{eqn:aisleBAndDownC}
+		\end{equation}
+		$\rightarrow$ Driving down B, encountering an obstacle, waiting at C (\ref{eqn:aisleBAndWaitingC})
+		\begin{equation}
+			\begin{split}
+			L_{IB_1}+L_{B_1C_1}+L_WT_C+L_{C_1C}+L_{CG}
+			\end{split}
+			\label{eqn:aisleBAndWaitingC}
+		\end{equation}
+		$\rightarrow$ Drivign down B, encountering an obstacle, driving down C, encountering and obstacle, drivign down D (\ref{eqn:aisleBAndCDownD})
+		\begin{equation}
+			\begin{split}
+			L_{IB_1}+L_{B_1C_1}+L_{C_1D}+L_{DG}
+			\end{split}
+			\label{eqn:aisleBAndCDownD}
+		\end{equation}
+		\\
+		Ignring A because it is going to have the highest cost as the planner attempts moving to the goal through the shortest path
+		\\
+		Average of the 4 costs are:
+
+		\begin{equation}
+			\begin{split}
+			L_D+L_{DG} \leq \frac{\eta}{4}\\
+			\text{where:} \\
+			\eta = 4L_{IB_1}+2L_{B1C1}+L_WT_B+L_{B_1B}+L_{BC}+3L_{CG}+L_{B_1C}+L_{CG}+L_WT_C+L_{C_1G}+L_{DG}+L_{GD}\\
+			\mathbb{E}[T_B] = \frac{P_B}{\lambda_B}; \mathbb{E}[T_C]=\frac{P_C}{\lambda_C}
+			\end{split}
+			\label{eqn:costAverage}
+		\end{equation}
+
+
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%
