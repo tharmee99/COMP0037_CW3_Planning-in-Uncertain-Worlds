@@ -73,9 +73,11 @@
 	
 	%%%%%%%%%%% PART 1 %%%%%%%%%%%%%%%%%
 	\section{Decision Re-Plan Policy}
+	\label{sec:decisionReplanPolicy}
 
 		\subsection{Policy Selection when Obstacle is Observed}
-			
+		\label{sec:policySelectionWhenObstacleIsObserved}
+		
 			\begin{figure}[H]
 				\centering
 				\begin{subfigure}{.4\textwidth}
@@ -94,22 +96,22 @@
 				\label{fig:task1_1Figures}
 			\end{figure}
 
-			The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to go from a cell $I$ to a cell $G$. These cells are marked blue and green in Fig. \ref{fig:originalPlannedPath} respectively. The figure also shows the original planned path that the robot computed going down aisle B. However, once the robot turns into aisle B it observes that the aisle is blocked. This observation is done at the point when the robot reaches the cell labelled $B_{1}$. At this point the robot can either decide to wait until the obstruction clears or it can re-plan a path. Once the robot observes the obstacle, the time the robot must wait for the obstacle to clear may be represented by the expression in Eq. \ref{eq:waitTime}. 
+			The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to go from a cell $I$ to a cell $G$. These cells are marked blue and green in Fig. \ref{fig:originalPlannedPath} respectively. The figure also shows the original planned path that the robot computed going down aisle B. However, once the robot turns into aisle B it observes that the aisle is blocked. This observation is done at the point when the robot reaches the cell labelled $B_{1}$. At this point the robot can either decide to wait until the obstruction clears or it can re-plan a path. Once the robot observes the obstacle, the time the robot must wait for the obstacle to clear may be represented by the expression in Eq. \ref{eqn:waitTime}. 
 
 			\begin{equation}
 				T=\frac{0.5}{\lambda_{B}}+\widetilde{T}
-				\label{eq:waitTime}
+				\label{eqn:waitTime}
 			\end{equation}
 
-			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from a exponential distribution with a rate parameter of $0.5\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. \ref{eq:waitTimePDF}. 
+			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from a exponential distribution with a rate parameter of $2\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. \ref{eqn:waitTimePDF}. 
 
 			\begin{equation}
 				f(t) = 
 				\begin{cases}
-				\lambda e^{-\lambda t} & \quad t \geq 0 \\
+				2\lambda_{B} e^{-2\lambda_{B} t} & \quad t \geq 0 \\
 				0 & \quad t < 0
 				\end{cases}
-				\label{eq:waitTimePDF}
+				\label{eqn:waitTimePDF}
 			\end{equation}
 			where, $\lambda = \dfrac{\lambda_{B}}{0.5}$. 
 			
@@ -119,11 +121,11 @@
 			Let us assume that if the robot decides to wait the total path length (number of cells) will be $K_1$ while if the robot decides to re-plan and execute the total path length will be $K_2$. We let the quantity $K$ equal to the larger value between $K_1$ and $K_2$. Now we may write the policy for the robot to wait as $\pi_{K}^{1}$ and the policy for re-planning as $\pi_{K}^{2}$. These policies are padded correspondingly to produce actions $\textbf{u}_{K}^{1}$ and $\textbf{u}_{K}^{1}$ that are padded with zero-cost state preserving actions.
 			\\
 			\\
-			To see which policy is better on average, we consider the expected value of the cost function for both cases. The case when policy $\pi_{K}^{1}$ is chosen is characterized by the inequality shown in Eq. \ref{eq:costExpectation}.
+			To see which policy is better on average, we consider the expected value of the cost function for both cases. The case when policy $\pi_{K}^{1}$ is chosen is characterized by the inequality shown in Eq. \ref{eqn:costExpectation}.
 
 			\begin{equation}
 				\mathbb{E}\left[L\left(\pi_{K}^{1}\right)\right] \leq \mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right]
-				\label{eq:costExpectation}
+				\label{eqn:costExpectation}
 			\end{equation}
 
 			\begin{figure}[H]
@@ -133,21 +135,21 @@
 				\label{fig:replannedPathAisleB}
 			\end{figure}
 
-			We can see from Fig. \ref{fig:originalPlannedPath} that the cost of the original planned path is given by the expression in Eq. \ref{eq:waitingPolicyCost}. In this equation, the terms $L_{XY}$ denote the cost of the shortest path between cell $X$ and cell $Y$. Additionally, the term $L_{W}$ represents the cost of waiting 1 unit of time.
+			We can see from Fig. \ref{fig:originalPlannedPath} that the cost of the original planned path is given by the expression in Eq. \ref{eqn:waitingPolicyCost}. In this equation, the terms $L_{XY}$ denote the cost of the shortest path between cell $X$ and cell $Y$. Additionally, the term $L_{W}$ represents the cost of waiting 1 unit of time.
 			
 			\begin{equation}
 				L\left(\pi_{K}^{1}\right) = L_{IB_{1}} + TL_W + L_{B_{1}B} + L_{BC} + L_{CG}
-				\label{eq:waitingPolicyCost}
+				\label{eqn:waitingPolicyCost}
 			\end{equation}
 
-			From Fig. \ref{fig:replannedPathAisleB} which shows the re-planned path, we can also see that the cost of this path is equal to the expression in Eq. \ref{eq:replanPolicyCost}
+			From Fig. \ref{fig:replannedPathAisleB} which shows the re-planned path, we can also see that the cost of this path is equal to the expression in Eq. \ref{eqn:replanPolicyCost}
 
 			\begin{equation}
 				L\left(\pi_{K}^{2}\right) = L_{IB_{1}} + L_{B_{1}C_{1}} + L_{C_{1}C} + L_{CG}
-				\label{eq:replanPolicyCost}
+				\label{eqn:replanPolicyCost}
 			\end{equation}
 
-			Substituting the expressions in Eq. \ref{eq:waitingPolicyCost} and Eq. \ref{eq:replanPolicyCost} into Eq. \ref{eq:costExpectation}. We obtain the inequality shown in Eq. \ref{eq:costExpectation1}
+			Substituting the expressions in Eq. \ref{eqn:waitingPolicyCost} and Eq. \ref{eqn:replanPolicyCost} into Eq. \ref{eqn:costExpectation}. We obtain the inequality shown in Eq. \ref{eqn:costExpectation1}
 
 			\begin{equation}
 				\begin{split}
@@ -155,10 +157,10 @@
 					L_{IB_{1}} + \mathbb{E}\left[T\right] L_W + L_{B_{1}B} + L_{BC} + L_{CG} & \leq L_{IB_{1}} + L_{B_{1}C_{1}} + L_{C_{1}C} + L_{CG} \\
 					\mathbb{E}\left[T\right] & \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}{L_W}
 				\end{split}
-				\label{eq:costExpectation1}
+				\label{eqn:costExpectation1}
 			\end{equation}
 
-			The quantity $\mathbb{E}\left[T\right]$ is the expected value for the time the robot has to wait for the obstacle to clear. As we know the distribution that the variable is sampled from we can compute the expected value. The expected value for the time taken is given by the expression found in Eq. \ref{eq:waitTimeExpectation}
+			The quantity $\mathbb{E}\left[T\right]$ is the expected value for the time the robot has to wait for the obstacle to clear. As we know the distribution that the variable is sampled from we can compute the expected value. The expected value for the time taken is given by the expression found in Eq. \ref{eqn:waitTimeExpectation}
 
 			\begin{equation}
 				\begin{split}
@@ -171,23 +173,44 @@
 					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\lim_{x \to +\infty} \left[-te^{0.5\lambda_{B}t} + \frac{\lambda_{B}}{0.5}e^{\frac{0.5}{\lambda_{B}}t}\right] - \frac{\lambda_{B}}{0.5}\right] \\
 					& = \frac{0.5}{\lambda_{B}} - \frac{\lambda_{B}}{0.5}\times \frac{0.5}{\lambda_{B}} = \frac{0.5}{\lambda_{B}}-1
 				\end{split}
-				\label{eq:waitTimeExpectation}
+				\label{eqn:waitTimeExpectation}
 			\end{equation}
 
-			Substituting the expression from Eq. \ref{eq:waitTimeExpectation} into Eq. \ref{eq:costExpectation1} we obtain the expression in Eq. \ref{eq:lambdaInequality}. The right-hand side of the inequality in Eq. \ref{eq:lambdaInequality} represents the smallest possible value for $\lambda_{B}$ for which the waiting policy $\pi_K^1$ is a better option than the re-plan policy $\pi_K^2$. The inequality also takes into consideration the constraint that $\lambda_{B} > 0$ and negates the solution when $\lambda_{B} < 0$.
+			Substituting the expression from Eq. \ref{eqn:waitTimeExpectation} into Eq. \ref{eqn:costExpectation1} we obtain the expression in Eq. \ref{eqn:lambdaInequality}. The right-hand side of the inequality in Eq. \ref{eqn:lambdaInequality} represents the smallest possible value for $\lambda_{B}$ for which the waiting policy $\pi_K^1$ is a better option than the re-plan policy $\pi_K^2$. The inequality also takes into consideration the constraint that $\lambda_{B} > 0$ and negates the solution when $\lambda_{B} < 0$.
 
 			\begin{equation}
 				\begin{split}
-					\frac{0.5}{\lambda_{B}}-1 & \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}{L_W} \\
-					\frac{0.5}{\lambda_{B}}& \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}+L_W}{L_W} \\
-					\lambda_{B} & \geq \frac{0.5L_W}{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}+L_W}
+					\frac{1}{\lambda_{B}} & \leq \frac{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}{L_W} \\	
+					\lambda_{B} & \geq \frac{L_W}{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}}
 				\end{split}
-				\label{eq:lambdaInequality}
+				\label{eqn:lambdaInequality}
 			\end{equation}
 
 		\subsection{Policy Selection at Start}
-			The cost to attempt going down aisle B:
-
+		\label{sec:policySelectionAtStart}
+		
+			\begin{figure}[H]
+				\centering
+				\begin{subfigure}{.4\textwidth}
+					\centering
+					\includegraphics[width=\linewidth]{blockedAisleB.png}
+					\caption{The scenario where the robot decides to go down Aisle B, encounters an obstacles and waits for it to clear.}
+					\label{fig:plannedPathAisleB}
+				\end{subfigure}
+				\begin{subfigure}{.4\textwidth}
+					\centering
+					\includegraphics[width=\linewidth]{plannedPathAisleC.png}
+					\caption{The scenario where the robot decides to avoid Aisle B completely due to the obstacle.}
+					\label{fig:plannedPathAisleC}
+				\end{subfigure}
+				\caption{The different policies the robot can pick from at the beginning.}
+				\label{fig:task1_2Figures}
+			\end{figure}
+			
+			Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it start to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
+			\\
+			TODO
+			\\
 			\begin{equation}
 				\begin{split}
 				L(\pi_k^1) =L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}\\
