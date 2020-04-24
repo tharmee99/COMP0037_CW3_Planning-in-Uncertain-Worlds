@@ -166,7 +166,7 @@
 				\begin{split}
 					\mathbb{E}\left[T\right] & = \mathbb{E}\left[\frac{0.5}{\lambda_{B}}+\widetilde{T}\right] \\
 					& = \frac{0.5}{\lambda_{B}} + \mathbb{E}\left[\widetilde{T}\right] \\
-					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}t\frac{\lambda_{B}}{0.5}e^{\frac{\lambda_{B}}{0.5}t} dt \\
+					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}t\frac{\lambda_{B}}{0.5}e^{-\frac{\lambda_{B}}{0.5}t} dt \\
 					& = \frac{0.5}{\lambda_{B}} + \frac{\lambda_{B}}{0.5}\left[-\left(t\right) \left(\frac{0.5}{\lambda_{B}}e^{-\frac{\lambda_{B}}{0.5}t}\right) - \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}e^{-\frac{\lambda_{B}}{0.5}t} dt \right]_{0}^{\infty}\\
 					& = \frac{0.5}{\lambda_{B}} + \frac{\lambda_{B}}{0.5} \times \frac{0.5}{\lambda_{B}} \left[-te^{-\frac{\lambda_{B}}{0.5}t} + \left[-\frac{\lambda_{B}}{0.5}e^{-\frac{\lambda_{B}}{0.5}t}\right]\right]_{0}^{\infty} \\
 					& = \frac{0.5}{\lambda_{B}} + \left[-te^{-\frac{\lambda_{B}}{0.5}t} - \frac{\lambda_{B}}{0.5}e^{-\frac{\lambda_{B}}{0.5}t}\right]_{0}^{\infty} \\
@@ -210,28 +210,35 @@
 			 Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it start to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
 			\\
 			\\
-			We can see from Fig. \ref{fig:plannedPathAisleB} that the cost of policy that goes down aisle B, $\pi_{K}^{1}$, can be given by the expression in Eq. \ref{eqn:waitPolicyCostStart}. Once again the quantity T represents the amount of time the robot must wait and the quantity $L_W$ represents the cost of waiting one unit of time. In this case there is only one nature action to be considered. This is the blocked aisle B.
+			We can see from Fig. \ref{fig:plannedPathAisleB} that the cost of policy that goes down aisle B, $\pi_{K}^{1}$, can cause 2 different scenarios: 
+			\begin{itemize}
+				\item Drive down aisle B and wait for the obstacle to move. The cost of this scenario is given by the expression:
+				\begin{equation}
+				L(\pi_k^1) = L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}
+				\label{eqn:waitPolicyCostStart1}
+				\end{equation}
+				\item Drive down aisle B, encounter an obstacle and reroute via aisle C.The cost of this scenario is given by the expression:
+				\begin{equation}
+				L(\pi_k^1) = L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}
+				\label{eqn:waitPolicyCostStart2}
+				\end{equation}
+			\end{itemize}
 			
-			\begin{equation}
-			L(\pi_k^1) = L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}
-			\label{eqn:waitPolicyCostStart}
-			\end{equation}
-			
-			Similarly the cost of the policy that goes down aisle C, $\pi_{K}^{2}$, is given by the expression in Eq. \ref{eqn:aisleCPolicyCostStart}.
+			The cost of the policy $\pi_{K}^{2}$, which associates to the robot deciding to drive down directly via aisle C is given by the expression in Eq. \ref{eqn:aisleCPolicyCostStart}.
 			
 			\begin{equation}
 			L(\pi_k^2) = L_{IC}+L_{CG}
 			\label{eqn:aisleCPolicyCostStart}
 			\end{equation}
 			
-			As we are concerned with the average case scenario we compare the expected value of the loss function just as we did in \S \ref{sec:policySelectionWhenObstacleIsObserved}. $\pi_{K}^{2}$ will be chosen over $\pi_{K}^{1}$ if the expected value of it's cost is lower as shown by Eq. \ref{eqn:expectationInequality}.
+			As we are concerned with the average case scenario we compare the expected value of the loss function just as we did in section \ref{sec:policySelectionWhenObstacleIsObserved}. $\pi_{K}^{2}$ will be chosen over $\pi_{K}^{1}$ if the expected value of it's cost is lower as shown by Eq. \ref{eqn:expectationInequality}.
 			
 			\begin{equation}
 			\mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right] \leq \mathbb{E}\left[L\left(\pi_{K}^{1}\right)\right]
 			\label{eqn:expectationInequality}
 			\end{equation}
 			
-			Substituting the loss functions from Eq. \ref{eqn:waitPolicyCostStart} and \ref{eqn:aisleCPolicyCostStart} into the inequality in Eq. \ref{eqn:expectationInequality} we obtain the result shown in Eq. \ref{eqn:expectationInequality1}.
+			Given that we can intuitively think of the cost associated to the second scenario of driving down aisle B given by eq. (\ref{waitPolicyCostStart2}) is a much longer path than directly driving down aisle C we can eliminate that from the comparison. Then, substituting the loss functions from eq. (\ref{eqn:waitPolicyCostStart}) and (\ref{eqn:aisleCPolicyCostStart}) into the inequality in eq. (\ref{eqn:expectationInequality}), we obtain the result shown in eq. (\ref{eqn:expectationInequality1}).
 			
 			\begin{equation}
 			\begin{split}
@@ -244,7 +251,7 @@
 			
 			
 			
-			By substituting the expected value for $T$ found in Eq. \ref{eqn:waitTimeExpectation} we obtain a constraint for $\lambda_B$ as shown in Eq. \ref{eqn:constraintPlanAtStart}. The right hand side of the final inequality in Eq. \ref{eqn:constraintPlanAtStart} represents the largest value for $\lambda_B$ for which the robot will decide to go directly down aisle C avoiding aisle B. 
+			By substituting the expected value for $T$ found in eq. (\ref{eqn:waitTimeExpectation}) we obtain a constraint for $\lambda_B$ as shown in eq. (\ref{eqn:constraintPlanAtStart}). The right hand side of the final inequality in eq. (\ref{eqn:constraintPlanAtStart}) represents the largest value for $\lambda_B$ for which the robot will decide to go directly down aisle C avoiding aisle B. 
 			
 			\begin{equation}
 			\begin{split}
