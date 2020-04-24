@@ -10,6 +10,13 @@ class PlannerControllerBase(object):
         self.planner = planner
         self.controller = controller
 
+        # Rate parameter for the exponential distribution under question
+        self.waitLambda = 1
+        # Cost of waiting one unit of time
+        self.waitCost = 2
+        # Maximum amount of time the robot is allowed to wait before replanning
+        self.maxWaitTime = 10
+        
         self.currentPlannedPath = None
         self.robotRadius = rospy.get_param('robot_radius', 0.2)
 
