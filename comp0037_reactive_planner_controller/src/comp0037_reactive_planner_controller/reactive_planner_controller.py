@@ -126,6 +126,7 @@ class ReactivePlannerController(PlannerControllerBase):
             rospy.logwarn("Could not find a path to the goal at (%d, %d) via Aisle %s", \
                             goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
+        initialSearchGrid = self.planner.searchGrid.getSearchGrid()
         pathToAilse = self.planner.extractPathToGoal()
 
         # plan path from aisle to goal and extract the path
@@ -138,6 +139,10 @@ class ReactivePlannerController(PlannerControllerBase):
 
         # concatenate the two paths to obtain the actual planned path via the chosen aisle
         pathToAilse.addToEnd(pathToGoal)
+
+        self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
+        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAilse.waypoints)[0], list(pathToAilse.waypoints)[-1])
+        self.planner.searchGridDrawer.update()
 
         # Plot the planned path on the search grid
         self.planner.searchGridDrawer.drawPathGraphics(pathToAilse)
@@ -182,6 +187,7 @@ class ReactivePlannerController(PlannerControllerBase):
             # If we couldn't find a path, give up
             if self.currentPlannedPath is None:
                 return False
+
 
             # Drive along the path towards the goal. This returns True
             # if the goal was successfully reached. The controller
