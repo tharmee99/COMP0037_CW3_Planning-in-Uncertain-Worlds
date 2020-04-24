@@ -87,10 +87,13 @@ class ReactivePlannerController(PlannerControllerBase):
 
             # If the robot has waitied longer than self.maxWaitTime, stop waiting
             if (rospy.get_time() - startTime >= self.maxWaitTime):
+                print("Waited too long... replanning")
                 break
 
             print("Waiting for obstacle to clear...")
             rospy.sleep(0.5)
+
+        print("Finished waiting...")
         
     # Aisle Midpoints are computed to use as waypoints to plan paths to
     def getAisleMidpoint(self, aisle):
