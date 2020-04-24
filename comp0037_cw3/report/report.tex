@@ -111,7 +111,7 @@
 				\end{cases}
 				\label{eq:waitTimePDF}
 			\end{equation}
-			where, $\lambda = \dfrac{0.5}{\lambda_{B}}$. 
+			where, $\lambda = \dfrac{\lambda_{B}}{0.5}$. 
 			
 			As previously mentioned, the robot has two options to choose from: to wait for the obstacle to clear, or to re-plan and execute the new path. The two are different policies the robot must choose from. We use the symbol $\pi$ to denote a policy. A policy is a mapping from the world state to an action the robot can execute.
 			\\
@@ -164,7 +164,7 @@
 				\begin{split}
 					\mathbb{E}\left[T\right] & = \mathbb{E}\left[\frac{0.5}{\lambda_{B}}+\widetilde{T}\right] \\
 					& = \frac{0.5}{\lambda_{B}} + \mathbb{E}\left[\widetilde{T}\right] \\
-					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}te^{\frac{0.5}{\lambda_{B}}t} dt \\
+					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}te^{\frac{\lambda_{B}}{0.5}t} dt \\
 					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\left(t\right) \left(e^{-\frac{0.5}{\lambda_{B}}t}\right) - \int_{0}^{\infty}e^{-\frac{0.5}{\lambda_{B}}t} dt \right]_{0}^{\infty}\\
 					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{-\frac{0.5}{\lambda_{B}}t} - \left[-\frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]\right]_{0}^{\infty} \\
 					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{\frac{0.5}{\lambda_{B}}t} + \frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]_{0}^{\infty} \\
