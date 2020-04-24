@@ -80,3 +80,27 @@ class SearchGrid(object):
                             newGrid[gridX][gridY] = Cell((gridX, gridY), 1)
 
         self.grid = newGrid
+
+    def mergeGrid(self, secondSearchGrid):
+
+        assert((secondSearchGrid.width == self.width) and (secondSearchGrid.height == self.height))
+
+        for x in range(self.width):
+            for y in range(self.height):
+
+                # Obtain Cell Labels for both search grid cells
+                cellLabel1 = self.getCellFromCoords((x,y)).label
+                cellLabel2 = secondSearchGrid.getCellFromCoords((x,y)).label
+
+                if (cellLabel1 == CellLabel.GOAL):
+                    self.getCellFromCoords((x,y)).label = CellLabel.DEAD
+
+                if (cellLabel2 == CellLabel.START):
+                    self.getCellFromCoords((x,y)).label = CellLabel.DEAD
+                elif (cellLabel2 == CellLabel.GOAL):
+                    self.getCellFromCoords((x,y)).label = CellLabel.GOAL
+                elif (cellLabel2 == CellLabel.DEAD):
+                    self.getCellFromCoords((x,y)).label = CellLabel.DEAD
+                elif (cellLabel2 == CellLabel.ALIVE) and (not(cellLabel1 == CellLabel.DEAD)):
+                    self.getCellFromCoords((x,y)).label = CellLabel.ALIVE
+                    

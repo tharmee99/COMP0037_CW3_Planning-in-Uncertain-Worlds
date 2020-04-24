@@ -62,15 +62,15 @@ class ReactivePlannerController(PlannerControllerBase):
     
     def getAisleMidpoint(self, aisle):
         if (aisle == Aisle.A):
-            return (6.25,9.375)
+            return (6.25,8.375)
         elif (aisle == Aisle.B):
-            return (10.5,9.375)
+            return (10.5,8.375)
         elif (aisle == Aisle.C):
-            return (14.75,9.375)
+            return (14.75,8.375)
         elif (aisle == Aisle.D):
-            return (18.5,9.375)
+            return (18.5,8.375)
         elif (aisle == Aisle.E):
-            return (22.5,9.375)
+            return (22.5,8.375)
 
 
     # Plan a path to the goal which will go down the designated aisle. The code, as
@@ -91,6 +91,7 @@ class ReactivePlannerController(PlannerControllerBase):
             rospy.logwarn("Could not find a path to the goal at (%d, %d) via Aisle %s", \
                             goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
+        searchGrid1 = self.planner.searchGrid
         pathToAilse = self.planner.extractPathToGoal()
 
 
@@ -99,13 +100,16 @@ class ReactivePlannerController(PlannerControllerBase):
             rospy.logwarn("Could not find a path to the goal at (%d, %d) via Aisle %s", \
                             goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
+        searchGrid2 = self.planner.searchGrid
         pathToGoal = self.planner.extractPathToGoal()
 
-
-        # Extract the path
         pathToAilse.addToEnd(pathToGoal)
-        print(list(pathToAilse.waypoints)[0].coords)
-        print(list(pathToAilse.waypoints)[-1].coords)
+        self.planner.searchGrid = searchGrid1.mergeGrid(searchGrid2)
+        
+        self.planner.searchGridDrawer.update()
+
+        self.planner.searchGridDrawer.drawPathGraphics(pathToAilse)
+        
         return pathToAilse
 
     # This method drives the robot from the start to the final goal. It includes
