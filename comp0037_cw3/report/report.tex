@@ -166,12 +166,12 @@
 				\begin{split}
 					\mathbb{E}\left[T\right] & = \mathbb{E}\left[\frac{0.5}{\lambda_{B}}+\widetilde{T}\right] \\
 					& = \frac{0.5}{\lambda_{B}} + \mathbb{E}\left[\widetilde{T}\right] \\
-					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}te^{\frac{\lambda_{B}}{0.5}t} dt \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\left(t\right) \left(e^{-\frac{0.5}{\lambda_{B}}t}\right) - \int_{0}^{\infty}e^{-\frac{0.5}{\lambda_{B}}t} dt \right]_{0}^{\infty}\\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{-\frac{0.5}{\lambda_{B}}t} - \left[-\frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]\right]_{0}^{\infty} \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[te^{\frac{0.5}{\lambda_{B}}t} + \frac{\lambda_{B}}{0.5}e^{-\frac{0.5}{\lambda_{B}}t}\right]_{0}^{\infty} \\
-					& = \frac{0.5}{\lambda_{B}} + \frac{0.5}{\lambda_{B}}\left[\lim_{x \to +\infty} \left[-te^{0.5\lambda_{B}t} + \frac{\lambda_{B}}{0.5}e^{\frac{0.5}{\lambda_{B}}t}\right] - \frac{\lambda_{B}}{0.5}\right] \\
-					& = \frac{0.5}{\lambda_{B}} - \frac{\lambda_{B}}{0.5}\times \frac{0.5}{\lambda_{B}} = \frac{0.5}{\lambda_{B}}-1
+					& = \frac{0.5}{\lambda_{B}} + \int_{0}^{\infty}t\frac{\lambda_{B}}{0.5}e^{\frac{\lambda_{B}}{0.5}t} dt \\
+					& = \frac{0.5}{\lambda_{B}} + \frac{\lambda_{B}}{0.5}\left[-\left(t\right) \left(\frac{0.5}{\lambda_{B}}e^{-\frac{\lambda_{B}}{0.5}t}\right) - \int_{0}^{\infty}\frac{0.5}{\lambda_{B}}e^{-\frac{\lambda_{B}}{0.5}t} dt \right]_{0}^{\infty}\\
+					& = \frac{0.5}{\lambda_{B}} + \frac{\lambda_{B}}{0.5} \times \frac{0.5}{\lambda_{B}} \left[-te^{-\frac{\lambda_{B}}{0.5}t} + \left[-\frac{\lambda_{B}}{0.5}e^{-\frac{\lambda_{B}}{0.5}t}\right]\right]_{0}^{\infty} \\
+					& = \frac{0.5}{\lambda_{B}} + \left[-te^{-\frac{\lambda_{B}}{0.5}t} - \frac{\lambda_{B}}{0.5}e^{-\frac{\lambda_{B}}{0.5}t}\right]_{0}^{\infty} \\
+					& = \frac{0.5}{\lambda_{B}} + \left[\lim_{t \to \infty} -te^{-\frac{\lambda_{B}}{0.5}t} + \frac{0.5}{\lambda_{B}}e^{-\infty} + 0 + \frac{\lambda_{B}}{0.5}e^0\right] \\
+					& = \frac{0.5}{\lambda_{B}} +\frac{0.5}{\lambda_{B}} = \frac{1}{\lambda_{B}}
 				\end{split}
 				\label{eqn:waitTimeExpectation}
 			\end{equation}
@@ -207,20 +207,51 @@
 				\label{fig:task1_2Figures}
 			\end{figure}
 			
-			Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it start to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
+			 Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it start to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
 			\\
-			TODO
 			\\
+			We can see from Fig. \ref{fig:plannedPathAisleB} that the cost of policy that goes down aisle B, $\pi_{K}^{1}$, can be given by the expression in Eq. \ref{eqn:waitPolicyCostStart}. Once again the quantity T represents the amount of time the robot must wait and the quantity $L_W$ represents the cost of waiting one unit of time. In this case there is only one nature action to be considered. This is the blocked aisle B.
+			
 			\begin{equation}
-				\begin{split}
-				L(\pi_k^1) =L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}\\
-				L(\pi_k^2) = L_{IC}+L_{CG}\\
-				\mathbb{E}[L_{IB_1}+TL_W + L_{B_1B}+L{BC}+L{CG}] \geq \mathbb{E}[L_{IC}+L_{CG}]\\
-				\mathbb{E}[T]L_W \geq L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\\
-				\mathbb{E} \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}\\
-				\frac{0.5}{\lambda_B} \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}\\
-				\lambda_B \leq \frac{0.5L_W}{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}
-				\end{split}
+			L(\pi_k^1) = L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}
+			\label{eqn:waitPolicyCostStart}
+			\end{equation}
+			
+			Similarly the cost of the policy that goes down aisle C, $\pi_{K}^{2}$, is given by the expression in Eq. \ref{eqn:aisleCPolicyCostStart}.
+			
+			\begin{equation}
+			L(\pi_k^2) = L_{IC}+L_{CG}
+			\label{eqn:aisleCPolicyCostStart}
+			\end{equation}
+			
+			As we are concerned with the average case scenario we compare the expected value of the loss function just as we did in \S \ref{sec:policySelectionWhenObstacleIsObserved}. $\pi_{K}^{2}$ will be chosen over $\pi_{K}^{1}$ if the expected value of it's cost is lower as shown by Eq. \ref{eqn:expectationInequality}.
+			
+			\begin{equation}
+			\mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right] \leq \mathbb{E}\left[L\left(\pi_{K}^{1}\right)\right]
+			\label{eqn:expectationInequality}
+			\end{equation}
+			
+			Substituting the loss functions from Eq. \ref{eqn:waitPolicyCostStart} and \ref{eqn:aisleCPolicyCostStart} into the inequality in Eq. \ref{eqn:expectationInequality} we obtain the result shown in Eq. \ref{eqn:expectationInequality1}.
+			
+			\begin{equation}
+			\begin{split}
+			\mathbb{E}[L_{IC}+L_{CG}] \leq \mathbb{E}[L_{IB_1}+TL_W + L_{B_1B}+L_{BC}+L_{CG}] \\
+			\mathbb{E}[T]L_W \geq L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\\
+			\mathbb{E}[T] \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}
+			\end{split}
+			\label{eqn:expectationInequality1}
+			\end{equation}
+			
+			
+			
+			By substituting the expected value for $T$ found in Eq. \ref{eqn:waitTimeExpectation} we obtain a constraint for $\lambda_B$ as shown in Eq. \ref{eqn:constraintPlanAtStart}. The right hand side of the final inequality in Eq. \ref{eqn:constraintPlanAtStart} represents the largest value for $\lambda_B$ for which the robot will decide to go directly down aisle C avoiding aisle B. 
+			
+			\begin{equation}
+			\begin{split}
+			\frac{1}{\lambda_B} \geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}\\
+			\lambda_B \leq \frac{L_W}{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}
+			\end{split}
+			\label{eqn:constraintPlanAtStart}
 			\end{equation}
 
 		\subsection{Considering the Probability of the Obstacle Being Present}
