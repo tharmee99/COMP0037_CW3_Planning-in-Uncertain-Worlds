@@ -2,6 +2,7 @@
 # controller. This monitors the the robot motion.
 
 import rospy
+import os
 import threading
 from cell import CellLabel
 from planner_controller_base import PlannerControllerBase
@@ -18,6 +19,8 @@ class ReactivePlannerController(PlannerControllerBase):
         self.mapUpdateSubscriber = rospy.Subscriber('updated_map', MapUpdate, self.mapUpdateCallback)
         self.gridUpdateLock =  threading.Condition()
         self.aisleToDriveDown = None
+
+        self.exportDirectory = None
 
     def mapUpdateCallback(self, mapUpdateMessage):
 
@@ -54,7 +57,7 @@ class ReactivePlannerController(PlannerControllerBase):
     # Choose the first aisle the robot will initially drive down.
     # This is based on the prior.
     def chooseInitialAisle(self, startCellCoords, goalCellCoords):
-        return Aisle.B
+        return Aisle.E
 
     # Choose the subdquent aisle the robot will drive down
     def chooseAisle(self, startCellCoords, goalCellCoords):
@@ -149,8 +152,9 @@ class ReactivePlannerController(PlannerControllerBase):
 
         # Plot the planned path on the search grid
         self.planner.searchGridDrawer.drawPathGraphics(pathToAilse)
-        
-        # TODO: Search grid of first search is not displayed in final grid
+        print(self.exportDirectory)
+        saveFileName = os.path.join(self.exportDirectory, ("initial_search_grid_aisle" + str(aisle.name) + ".eps"))
+        self.planner.searchGridDrawer.saveAsImage(saveFileName)
 
         return pathToAilse
 

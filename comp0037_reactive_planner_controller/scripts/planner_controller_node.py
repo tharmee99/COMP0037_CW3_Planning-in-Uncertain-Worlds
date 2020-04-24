@@ -2,6 +2,8 @@
 import rospy
 import threading
 import math
+import os
+import sys
 
 # NOTE: THERE ARE SOME VERY, VERY BAD HACKS HERE WITH THREADING AT THE
 # MOMENT. WE'LL HAVE TO SEE IF WE CAN GET AWAY WITH IT IN PYTHON. THE
@@ -40,6 +42,12 @@ class PlannerControllerNode(object):
         self.goal = None
         self.goalReached = False
 
+        self.exportDirectory = None
+
+        if (len(sys.argv) > 1):
+            self.exportDirectory = sys.argv[1]
+            if not os.path.exists(self.exportDirectory):
+                os.makedirs(self.exportDirectory)
     
     def createOccupancyGridFromMapServer(self):
         
@@ -92,6 +100,7 @@ class PlannerControllerNode(object):
     def createPlannerController(self):
         if rospy.get_param('use_reactive_planner_controller', False) is True:
             self.plannerController = ReactivePlannerController(self.occupancyGrid, self.planner, self.robotController)
+            self.plannerController.exportDirectory = self.exportDirectory
         else:
             self.plannerController = PassivePlannerController(self.occupancyGrid, self.planner, self.robotController)
 

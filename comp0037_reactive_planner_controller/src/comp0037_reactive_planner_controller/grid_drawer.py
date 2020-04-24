@@ -6,6 +6,7 @@ from cell import *
 from graphics import Rectangle
 from graphics import Point
 import graphics
+import os
 
 # This file contains some generic routines for managing the graphics display window.
 
@@ -92,6 +93,14 @@ class BaseDrawer(object):
             input("Press enter to continue...")
         except SyntaxError:
             pass
+
+    def saveAsImage(self, exportFileDir):
+        baseDir = os.path.split(exportFileDir)[0]
+
+        if not os.path.exists(baseDir):
+            os.makedirs(baseDir)
+            
+        self.window.postscript(file=exportFileDir, colormode='color')
 
 class SearchGridDrawer(BaseDrawer):
 

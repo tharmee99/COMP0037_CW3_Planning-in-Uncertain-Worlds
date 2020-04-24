@@ -9,6 +9,7 @@
 
     <arg name="map_file" default="$(find comp0037_resources)/maps/factory_with_obstacles.yaml"/>
     <arg name="goal_file" default="$(find comp0037_cw3)/scenarios/factory/part2_goals.txt"/>
+    <arg name="export_dir" default="$(find comp0037_cw3)/exports"/>
 
     <node pkg="comp0037_time_server" name="time_server" type="time_server_node.py"/>
 
@@ -22,7 +23,7 @@
 
     <include file="$(find comp0037_mapper)/launch/mapper.launch" />
 
-    <node pkg="comp0037_reactive_planner_controller" name="planner_controller" type="planner_controller_node.py" output="screen"/>
+    <node pkg="comp0037_reactive_planner_controller" name="planner_controller" type="planner_controller_node.py" output="screen" args="$(arg export_dir)"/>
     <node pkg="comp0037_obstacler" name="obstacler_node" type="obstaclerNode" output="screen"/>
     
     <include file="$(find stdr_gui)/launch/stdr_gui.launch"/>
