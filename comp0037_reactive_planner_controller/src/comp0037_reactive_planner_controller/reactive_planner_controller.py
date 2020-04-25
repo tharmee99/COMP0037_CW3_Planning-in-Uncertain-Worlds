@@ -133,7 +133,7 @@ class ReactivePlannerController(PlannerControllerBase):
                             goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
         initialSearchGrid = self.planner.searchGrid.getSearchGrid()
-        pathToAilse = self.planner.extractPathToGoal()
+        pathToAisle = self.planner.extractPathToGoal()
 
         # plan path from aisle to goal and extract the path
         pathToGoalFound = self.planner.search(aisleCellCoords, goalCellCoords)    
@@ -144,19 +144,19 @@ class ReactivePlannerController(PlannerControllerBase):
         pathToGoal = self.planner.extractPathToGoal()
 
         # concatenate the two paths to obtain the actual planned path via the chosen aisle
-        pathToAilse.addToEnd(pathToGoal)
+        pathToAisle.addToEnd(pathToGoal)
 
         self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
-        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAilse.waypoints)[0], list(pathToAilse.waypoints)[-1])
+        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAisle.waypoints)[0], list(pathToAisle.waypoints)[-1])
         self.planner.searchGridDrawer.update()
 
         # Plot the planned path on the search grid
-        self.planner.searchGridDrawer.drawPathGraphics(pathToAilse)
+        self.planner.searchGridDrawer.drawPathGraphics(pathToAisle)
         print(self.exportDirectory)
         saveFileName = os.path.join(self.exportDirectory, ("initial_search_grid_aisle" + str(aisle.name) + ".eps"))
         self.planner.searchGridDrawer.saveAsImage(saveFileName)
 
-        return pathToAilse
+        return pathToAisle
 
     # This method drives the robot from the start to the final goal. It includes
     # choosing an aisle to drive down and both waiting and replanning behaviour.
