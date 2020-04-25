@@ -3,6 +3,7 @@
 
 import rospy
 import os
+import time
 import threading
 from cell import CellLabel
 from planner_controller_base import PlannerControllerBase
@@ -67,7 +68,7 @@ class ReactivePlannerController(PlannerControllerBase):
 
     # Choose the subdquent aisle the robot will drive down
     def chooseAisle(self, startCellCoords, goalCellCoords):
-        return Aisle.D
+        return Aisle.C
 
     # Return whether the robot should wait for the obstacle to clear or not.
     def shouldWaitUntilTheObstacleClears(self, startCellCoords, goalCellCoords):
@@ -76,20 +77,37 @@ class ReactivePlannerController(PlannerControllerBase):
         nextChosenAisle = self.chooseAisle(startCellCoords,goalCellCoords)
         replanPathCost = self.planPathToGoalViaAisle(startCellCoords,goalCellCoords,nextChosenAisle).travelCost
 
-        # Computing the cost of waiting, the expected value for the wait time is given as 1/lambda
-        waitPathCost = self.currentPlannedPath.travelCost + self.waitCost*(1/self.waitLambda)
+        # Temporary planner object
+        tempPlanner = AStarPlanner('Temporary A* Planner', self.occupancyGrid)
+        tempPlanner.setPauseTime(0)
+        tempPlanner.showGraphics = False
+        # self.planner.windowHeightInPixels = rospy.get_param('maximum_window_height_in_pixels', 700)
 
-        print("the cost of replanning is: {}".format(replanPathCost))
-        print("the cost of waiting is: {}".format(waitPathCost))
+        # Computing the cost of current cell to start cell
+        tempPlanner.search(self.currentPlannedPath.waypoints[0].coords, startCellCoords)
+        pathToStart = tempPlanner.extractPathToGoal()
+        time.sleep(1)
+        # Computing the cost of waiting, the expected value for the wait time is given as 1/lambda
+        waitCost =  self.waitCost*(1/self.waitLambda)
+        waitPathCost = self.currentPlannedPath.travelCost - pathToStart.travelCost
+        waitPolicyCost = waitPathCost + waitCost
+
+        thresholdLambda = self.waitCost/(replanPathCost - waitPathCost)
+
+        rospy.loginfo("the cost of replanning policy is: {}".format(replanPathCost))
+        rospy.loginfo("the cost of the waiting policy is: {}".format(waitPolicyCost))
+        rospy.loginfo("the path-cost of the waiting path is: {}".format(waitPathCost))
+        rospy.loginfo("the cost of waiting is: {}".format(waitCost))
+        rospy.loginfo("Threshold lambda value: {}".format(thresholdLambda))
 
         # If waiting cost is lower then wait else replan
-        if(waitPathCost < replanPathCost):
+        if(waitPolicyCost < replanPathCost):
             return True
 
         return False
 
     # This method will wait until the obstacle has cleared and the robot can move.
-    def waitUntilTheObstacleClears(self):
+    def waitUntilTheObstacleClears(self, startCellCoords, goalCellCoords):
         
         # ROS time when the robot starts to wait
         startTime = rospy.get_time()
@@ -99,14 +117,14 @@ class ReactivePlannerController(PlannerControllerBase):
 
             # If the robot has waitied longer than self.maxWaitTime, stop waiting
             if (rospy.get_time() - startTime >= self.maxWaitTime):
-                print("Waited too long... replanning")
+                rospy.logwarn("Waited too long... replanning")
                 self.aisleToDriveDown = self.chooseAisle(startCellCoords, goalCellCoords)
                 break
 
             print("Waiting for obstacle to clear...")
             rospy.sleep(0.5)
 
-        print("Finished waiting...")
+        rospy.loginfo("Finished waiting...")
         
     # Aisle Midpoints are computed to use as waypoints to plan paths to
     def getAisleMidpoint(self, aisle):
@@ -140,6 +158,8 @@ class ReactivePlannerController(PlannerControllerBase):
         initialSearchGrid = self.planner.searchGrid.getSearchGrid()
         pathToAisle = self.planner.extractPathToGoal()
 
+        rospy.loginfo("Path Cost start To aisle: {}".format(pathToAisle.travelCost))
+
         # Plan path from aisle to goal and extract the path
         pathToGoalFound = self.planner.search(aisleCellCoords, goalCellCoords)    
         if (pathToGoalFound is False):
@@ -148,8 +168,10 @@ class ReactivePlannerController(PlannerControllerBase):
             return None
         pathToGoal = self.planner.extractPathToGoal()
 
+        rospy.loginfo("Path Cost aisle to goal: {}".format(pathToGoal.travelCost))
+
         # Concatenate the two paths to obtain the actual planned path via the chosen aisle
-        pathToAilse.addToEnd(pathToGoal)
+        pathToAisle.addToEnd(pathToGoal)
 
         # Merge the two search grids and update start/goal cells
         self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
@@ -157,7 +179,7 @@ class ReactivePlannerController(PlannerControllerBase):
         self.planner.searchGridDrawer.update()
 
         # Plot the planned path on the search grid
-        self.planner.searchGridDrawer.drawPathGraphics(pathToAilse)
+        self.planner.searchGridDrawer.drawPathGraphics(pathToAisle)
 
         # Save the search grid as an image
         if ((self.initialPlanFlag) and (self.exportDirectory is not None)):
@@ -233,7 +255,7 @@ class ReactivePlannerController(PlannerControllerBase):
             # Depending upon the decision, either wait or determine the new aisle
             # we should drive down.
             if waitingGame is True:
-                self.waitUntilTheObstacleClears()
+                self.waitUntilTheObstacleClears(startCellCoords, goalCellCoords)
             else:
                 self.aisleToDriveDown = self.chooseAisle(startCellCoords, goalCellCoords)
 
