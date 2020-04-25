@@ -138,7 +138,7 @@ class ReactivePlannerController(PlannerControllerBase):
                             goalCellCoords[0], goalCellCoords[1], aisle.name)
             return None
         initialSearchGrid = self.planner.searchGrid.getSearchGrid()
-        pathToAilse = self.planner.extractPathToGoal()
+        pathToAisle = self.planner.extractPathToGoal()
 
         # Plan path from aisle to goal and extract the path
         pathToGoalFound = self.planner.search(aisleCellCoords, goalCellCoords)    
@@ -153,7 +153,7 @@ class ReactivePlannerController(PlannerControllerBase):
 
         # Merge the two search grids and update start/goal cells
         self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
-        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAilse.waypoints)[0], list(pathToAilse.waypoints)[-1])
+        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAisle.waypoints)[0], list(pathToAisle.waypoints)[-1])
         self.planner.searchGridDrawer.update()
 
         # Plot the planned path on the search grid
@@ -165,7 +165,7 @@ class ReactivePlannerController(PlannerControllerBase):
             self.planner.searchGridDrawer.saveAsImage(saveFileName)
             self.initialPlanFlag = False
 
-        return pathToAilse
+        return pathToAisle
 
     # This method drives the robot from the start to the final goal. It includes
     # choosing an aisle to drive down and both waiting and replanning behaviour.

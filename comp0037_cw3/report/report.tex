@@ -193,12 +193,27 @@
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%
-	\section{ROS Implementation}
-
-		
-
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\section{Implementation of the System in ROS}
+	\subsection{Planning path via an Aisle}
+	In the given map of the environment (Fig. \ref{fig:originalPlannedPath}), we can see that the map has 5 labelled aisles - A, B, C, D and E. For the given system, it might be desirable to be able to control the path planning such that the planned path goes down an aisle. 
 	
+	To implement this system, the function \textit{planPathToGoalViaAisle()} in \textit{comp0037\textunderscore reactive\textunderscore planner\textunderscore controller\slash src\slash reactive\textunderscore planner\textunderscore controller.py} was completed. To ensure that the path planned goes down a particular aisle, a multiple destination path planning approach was adopted such that the first destination is the mid point\footnote{The walls dividing the aisles are disjoint in the middle this means that choosing the mid point would ensure this algorithm does not result in adding to a higher cost than is required to be able to plan a via an aisle. Hence, the mid point was chosen.} of the aisle the path has go down and the second and final destination is the goal.
+	The function \textit{planPathToGoalViaAisle()} first checks to see if the class variable \textit{aisleToDriveDown} is None. If this is true, it assigns the value of the function parameter \textbf{aisle} to \textbf{aisleToDriveDown} and then the coordinates of the midpoint of the aisle is found. Once, the aisle cell coordinates are obtained path planning is done by calling \textbf{planner.search} twice. First the path is planned from the starting cell (\textit{startCellCoords}) to the mid point of the aisle (\textit{aisleCellCoords}). Then, a path is planned from the mid point of the aisle(\textit{aisleCellCoords}) to the goal cell (\textit{goalCellCoords}). Finally, the two individual paths are concatenated together and the concatenated path is plotted on search grid so that the resulting planned path can be observed.
+
+	The resulting search grid to demonstrate the performance of this function can be seen in Fig. \ref{fig:result-of-plan-via-aisle} below.
+	\begin{figure}[htp]
+		\includegraphics[width=.5\textwidth]{../exports/initial_search_grid_aisleA}
+		\includegraphics[width=.5\textwidth]{../exports/initial_search_grid_aisleB} 
+		\includegraphics[width=.5\textwidth]{../exports/initial_search_grid_aisleC}
+		\includegraphics[width=.5\textwidth]{../exports/initial_search_grid_aisleD} 
+		\medskip
+		\includegraphics[width=.5\textwidth]{../exports/initial_search_grid_aisleE}
+		
+		\caption{The demonstration of results of planning via each of the aisles.}
+		\label{fig:result-of-plan-via-aisle}
+	\end{figure}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	\bibliographystyle{IEEEtran}
 	\bibliography{references}
 
