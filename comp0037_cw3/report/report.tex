@@ -289,51 +289,91 @@
 		
 		\subsection{Considering Multiple Obstacles}
 		
-			There can be 4 cases:\\
-			$\rightarrow$ Driving down to aisle B and waiting (\ref{eqn:aisleBAndWaiting})
-			\begin{equation}
-			\begin{split}
-			L_{IB_1}+V_WT_B+L_{B_1V}+L_{BC}+L_{CG}
-			\end{split}
-			\label{eqn:aisleBAndWaiting}
-			\end{equation}
-			$\rightarrow$ Driving down to aisle B encountering an obstacle, driving down aisle C (\ref{eqn:aisleBAndDownC})
-			\begin{equation}
-			\begin{split}
-			L_{IB_1}+L_{B_1C}+L_{CG}
-			\end{split}
-			\label{eqn:aisleBAndDownC}
-			\end{equation}
-			$\rightarrow$ Driving down B, encountering an obstacle, waiting at C (\ref{eqn:aisleBAndWaitingC})
-			\begin{equation}
-			\begin{split}
-			L_{IB_1}+L_{B_1C_1}+L_WT_C+L_{C_1C}+L_{CG}
-			\end{split}
-			\label{eqn:aisleBAndWaitingC}
-			\end{equation}
-			$\rightarrow$ Drivign down B, encountering an obstacle, driving down C, encountering and obstacle, drivign down D (\ref{eqn:aisleBAndCDownD})
-			\begin{equation}
-			\begin{split}
-			L_{IB_1}+L_{B_1C_1}+L_{C_1D}+L_{DG}
-			\end{split}
-			\label{eqn:aisleBAndCDownD}
-			\end{equation}
-			\\
-			Ignring A because it is going to have the highest cost as the planner attempts moving to the goal through the shortest path
-			\\
-			Average of the 4 costs are:
+			Let us now assume that both aisles B and C have obstacles on them. The wait time for the obstacle in aisle B to clear is sampled from the distribution outlined in Eq. (\ref{eqn:waitTime}). The probability of the obstacle in aisle B being present is once again given as $p_B$. Similarly the obstacle in aisle C has an identical wait time distribution as the obstacle in aisle B but with a characterizing parameter of $\lambda_C$. The probability of this obstacle being present is given by the probability $p_C$. Following this, the expected wait times for obstacle B and obstacle C are as follows:
 			
 			\begin{equation}
 			\begin{split}
-			L_D+L_{DG} \leq \frac{\eta}{4}\\
-			\text{where:} \\
-			\eta = 4L_{IB_1}+2L_{B1C1}+L_WT_B+L_{B_1B}+L_{BC}+3L_{CG}+L_{B_1C}+L_{CG}+L_WT_C+L_{C_1G}+L_{DG}+L_{GD}\\
-			\mathbb{E}[T_B] = \frac{P_B}{\lambda_B}; \mathbb{E}[T_C]=\frac{P_C}{\lambda_C}
+				\mathbb{E}_{B}[T] &= \frac{p_B}{\lambda_B} \\
+				\mathbb{E}_{C}[T] &= \frac{p_C}{\lambda_C} \\
 			\end{split}
-			\label{eqn:costAverage}
+			\label{eqn:expectedWaitTimeBC}
+			\end{equation}
+			
+			The robot has the same start and goal cells as described in \S \ref{sec:policySelectionWhenObstacleIsObserved}. Given that the robot chooses a policy at the beginning, there are 6 different key scenarios that are worth considering:
+			
+			\begin{itemize}
+				\item Policy $\pi_{K}^{1}$ : The robot goes down aisle B and observes an obstacle. It then decides to wait for the obstacle to clear. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{1}\right)\right] = L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG}
+					\label{eqn:policyOneCost}
+					\end{equation}
+					
+				\item Policy $\pi_{K}^{2}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C it observes another obstacle and waits for it to clear before continuing to the goal. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right] = L_{IB_1} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+					\label{eqn:policyTwoCost}
+					\end{equation}
+				
+				\item Policy $\pi_{K}^{3}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C it observes another obstacles so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{3}\right)\right] = L_{IB_1} + L_{B_1C_1} + L_{C_1} + L_{DG}
+					\label{eqn:policyThreeCost}
+					\end{equation}
+					
+				\item Policy $\pi_{K}^{4}$ : The robot goes down aisle C and observes an obstacle so it waits for the obstacle to clear before continuing to the goal. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{4}\right)\right] = L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+					\label{eqn:policyFourCost}
+					\end{equation}
+					
+				\item Policy $\pi_{K}^{5}$ : The robot goes down aisle C and observes an obstacle so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{5}\right)\right] = L_{IC_1} + L_{C_1D} + L_{DG}
+					\label{eqn:policyFiveCost}
+					\end{equation}
+				
+				\item Policy $\pi_{K}^{6}$ : The robot directly goes down aisle D which is known to have no obstacles and avoids both aisles B and C. The expected cost for this policy is given by:
+					\begin{equation}
+						\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = L_{ID} + L_{DG}
+					\label{eqn:policySixCost}
+					\end{equation}
+			\end{itemize}
+		
+			We ignore the case of going down aisle A and aisle E as these will inherently have a larger path length due to the topology of the example scenario. Additionally back-tracking of aisles is also ignored (e.g. going from aisle C back to aisle B) as this would also have larger costs than those considered above.
+			\\
+			\\
+			We are given that the robot chooses policy $\pi_{K}^{6}$ by going straight down aisle D. This suggests that the expected cost of this policy is lower than any other policy available to the robot as suggested by Eq. (\ref{eqn:minimumExpectation})
+			
+			\begin{equation}
+				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = \min_{n=1,\dots,6} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
+			\label{eqn:minimumExpectation}
 			\end{equation}
 	
-	
+			We start by comparing the policies $\pi_{K}^{1}$ and $\pi_{K}^{6}$. If $\pi_{K}^{6}$ is chosen between the two, then the following inequality must hold:
+			
+			\begin{equation}
+				 \mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG}
+			\label{eqn:policyOneInequlaity}
+			\end{equation}
+			
+			Similarly to choose $\pi_{K}^{6}$ over $\pi_{K}^{2}$ the inequality in Eq. (\ref{eqn:policyTwoInequlaity}) must hold:
+			
+			\begin{equation}
+				 \mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+			\label{eqn:policyTwoInequlaity}
+			\end{equation}
+			
+			by comparing the two inequalities in Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyTwoInequlaity}) we can see that even though there are some terms that are common, it is difficult to merge the two into one inequality. However, by using logic, we may derive an upper bound for the path cost of $\pi_{K}^{6}$. From Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyTwoInequlaity}) we can obtain the following inequality which will also hold:
+			
+			\begin{equation}
+				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+			\end{equation}
+			
+			Here we use the fact that if $A<B+C$ is true and $A<B+D$ is true then it must also follow that $A<B+C+D$. We can use this idea to compile the inequalities comparing each of the 5 policies to $\pi_{K}^{6}$ into one single inequality:
+			
+			\begin{equation}
+				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L{C_1D} + L_{DG} + L_{IC_1} + L_{ID}
+			\end{equation}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%
