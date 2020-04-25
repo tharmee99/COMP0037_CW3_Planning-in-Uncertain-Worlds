@@ -64,7 +64,40 @@ class ReactivePlannerController(PlannerControllerBase):
         if (initialAisle is not None):
             return Aisle[initialAisle]
         else:
-            return Aisle.B
+            # List of available aisles
+            aisles = [[Aisle.A, None],[Aisle.B, None],[Aisle.C, None],[Aisle.D, None],[Aisle.E, None]]
+
+            # Iterating through aisles and computing the path cost via said aisle
+            for aisle in aisles:
+                aisle[1] = self.planPathToGoalViaAisle(startCellCoords,goalCellCoords,aisle[0], False).travelCost
+
+            # Adding the average cost of waiting onto aisle B's path cost
+            waitCost = self.waitCost*(self.aisleBObstacleProbability/self.aisleBwaitLambda)
+            aisleBPathCost = aisles[1][1]
+            aisles[1][1] += waitCost
+
+            # Computing the threshold lambda value to choose C over B
+            thresholdLambda = self.waitCost/(self.aisleBObstacleProbability*(aisles[2][1] - aisleBPathCost))
+
+            # verbosity
+            for aisle in aisles:
+                rospy.loginfo("Cost of aisle {} policy: {}".format(aisle[0].name, aisle[1]))
+            
+            rospy.loginfo("Path cost via aisle B: {}".format(aisleBPathCost))
+            rospy.loginfo("Cost of waiting in aisle B: {}".format(waitCost))
+            rospy.loginfo("Threshold lambda value: {}".format(thresholdLambda))
+
+            # Identifying the aisle with the cheapers associated cost
+            minCost = float('inf')
+            bestAisle = Aisle.B
+            for aisle in aisles:
+                if (aisle[1] < minCost):
+                    minCost = aisle[1]
+                    bestAisle = aisle[0]
+
+            rospy.loginfo("Choosing Aisle {} as the best aisle".format(bestAisle.name))
+
+            return bestAisle
 
     # Choose the subdquent aisle the robot will drive down
     def chooseAisle(self, startCellCoords, goalCellCoords):
@@ -75,7 +108,7 @@ class ReactivePlannerController(PlannerControllerBase):
 
         # Computing cost of replanning
         nextChosenAisle = self.chooseAisle(startCellCoords,goalCellCoords)
-        replanPathCost = self.planPathToGoalViaAisle(startCellCoords,goalCellCoords,nextChosenAisle).travelCost
+        replanPathCost = self.planPathToGoalViaAisle(startCellCoords,goalCellCoords,nextChosenAisle, False).travelCost
 
         # Temporary planner object
         tempPlanner = AStarPlanner('Temporary A* Planner', self.occupancyGrid)
@@ -88,16 +121,17 @@ class ReactivePlannerController(PlannerControllerBase):
         pathToStart = tempPlanner.extractPathToGoal()
         time.sleep(1)
         # Computing the cost of waiting, the expected value for the wait time is given as 1/lambda
-        waitCost =  self.waitCost*(1/self.waitLambda)
+        waitCost =  self.waitCost*(1/self.aisleBwaitLambda)
         waitPathCost = self.currentPlannedPath.travelCost - pathToStart.travelCost
         waitPolicyCost = waitPathCost + waitCost
 
         thresholdLambda = self.waitCost/(replanPathCost - waitPathCost)
 
-        rospy.loginfo("the cost of replanning policy is: {}".format(replanPathCost))
-        rospy.loginfo("the cost of the waiting policy is: {}".format(waitPolicyCost))
-        rospy.loginfo("the path-cost of the waiting path is: {}".format(waitPathCost))
-        rospy.loginfo("the cost of waiting is: {}".format(waitCost))
+        # Verbosity is always good
+        rospy.loginfo("Cost of replanning policy is: {}".format(replanPathCost))
+        rospy.loginfo("Cost of the waiting policy is: {}".format(waitPolicyCost))
+        rospy.loginfo("Path-cost of the waiting path is: {}".format(waitPathCost))
+        rospy.loginfo("Cost of waiting is: {}".format(waitCost))
         rospy.loginfo("Threshold lambda value: {}".format(thresholdLambda))
 
         # If waiting cost is lower then wait else replan
@@ -121,6 +155,7 @@ class ReactivePlannerController(PlannerControllerBase):
                 self.aisleToDriveDown = self.chooseAisle(startCellCoords, goalCellCoords)
                 break
 
+            # Verbosity overdrive
             print("Waiting for obstacle to clear...")
             rospy.sleep(0.5)
 
@@ -143,11 +178,14 @@ class ReactivePlannerController(PlannerControllerBase):
     # Plan a path to the goal which will go down the designated aisle. The code, as
     # currently implemented simply tries to drive from the start to the goal without
     # considering the aisle.
-    def planPathToGoalViaAisle(self, startCellCoords, goalCellCoords, aisle):
+    def planPathToGoalViaAisle(self, startCellCoords, goalCellCoords, aisle, graphics = True):
 
         # Obtain aisle coords 
         aisleWorldCoords = self.getAisleMidpoint(aisle)
         aisleCellCoords = self.occupancyGrid.getCellCoordinatesFromWorldCoordinates(aisleWorldCoords)
+
+        # Show Graphics?
+        self.planner.showGraphics = graphics
 
         # Plan path to aisle and extract the path
         pathToAisleFound = self.planner.search(startCellCoords, aisleCellCoords)
@@ -173,19 +211,21 @@ class ReactivePlannerController(PlannerControllerBase):
         # Concatenate the two paths to obtain the actual planned path via the chosen aisle
         pathToAisle.addToEnd(pathToGoal)
 
-        # Merge the two search grids and update start/goal cells
-        self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
-        self.planner.searchGridDrawer.setStartAndGoal(list(pathToAisle.waypoints)[0], list(pathToAisle.waypoints)[-1])
-        self.planner.searchGridDrawer.update()
+        if (graphics):
 
-        # Plot the planned path on the search grid
-        self.planner.searchGridDrawer.drawPathGraphics(pathToAisle)
+            # Merge the two search grids and update start/goal cells
+            self.planner.searchGrid.leftMergeGrid(initialSearchGrid)
+            self.planner.searchGridDrawer.setStartAndGoal(list(pathToAisle.waypoints)[0], list(pathToAisle.waypoints)[-1])
+            self.planner.searchGridDrawer.update()
 
-        # Save the search grid as an image
-        if ((self.initialPlanFlag) and (self.exportDirectory is not None)):
-            saveFileName = os.path.join(self.exportDirectory, ("initial_search_grid_aisle" + str(aisle.name) + ".eps"))
-            self.planner.searchGridDrawer.saveAsImage(saveFileName)
-            self.initialPlanFlag = False
+            # Plot the planned path on the search grid
+            self.planner.searchGridDrawer.drawPathGraphics(pathToAisle)
+
+            # Save the search grid as an image
+            if ((self.initialPlanFlag) and (self.exportDirectory is not None)):
+                saveFileName = os.path.join(self.exportDirectory, ("initial_search_grid_aisle" + str(aisle.name) + ".eps"))
+                self.planner.searchGridDrawer.saveAsImage(saveFileName)
+                self.initialPlanFlag = False
 
         return pathToAisle
 
