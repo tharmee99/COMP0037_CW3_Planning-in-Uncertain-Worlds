@@ -72,9 +72,9 @@ class ReactivePlannerController(PlannerControllerBase):
                 aisle[1] = self.planPathToGoalViaAisle(startCellCoords,goalCellCoords,aisle[0], False).travelCost
 
             # Adding the average cost of waiting onto aisle B's path cost
-            waitCost = self.waitCost*(self.aisleBObstacleProbability/self.aisleBwaitLambda)
+            totalWaitCost = self.waitCost*(self.aisleBObstacleProbability/self.aisleBwaitLambda)
             aisleBPathCost = aisles[1][1]
-            aisles[1][1] += waitCost
+            aisles[1][1] += totalWaitCost
 
             # Computing the threshold lambda value to choose C over B
             thresholdLambda = self.waitCost/(self.aisleBObstacleProbability*(aisles[2][1] - aisleBPathCost))
@@ -84,7 +84,7 @@ class ReactivePlannerController(PlannerControllerBase):
                 rospy.loginfo("Cost of aisle {} policy: {}".format(aisle[0].name, aisle[1]))
             
             rospy.loginfo("Path cost via aisle B: {}".format(aisleBPathCost))
-            rospy.loginfo("Cost of waiting in aisle B: {}".format(waitCost))
+            rospy.loginfo("Cost of waiting in aisle B: {}".format(totalWaitCost))
             rospy.loginfo("Threshold lambda value: {}".format(thresholdLambda))
 
             # Identifying the aisle with the cheapers associated cost
@@ -121,9 +121,9 @@ class ReactivePlannerController(PlannerControllerBase):
         pathToStart = tempPlanner.extractPathToGoal()
         time.sleep(1)
         # Computing the cost of waiting, the expected value for the wait time is given as 1/lambda
-        waitCost =  self.waitCost*(1/self.aisleBwaitLambda)
+        totalWaitCost =  self.waitCost*(1/self.aisleBwaitLambda)
         waitPathCost = self.currentPlannedPath.travelCost - pathToStart.travelCost
-        waitPolicyCost = waitPathCost + waitCost
+        waitPolicyCost = waitPathCost + totalWaitCost
 
         thresholdLambda = self.waitCost/(replanPathCost - waitPathCost)
 
@@ -131,7 +131,7 @@ class ReactivePlannerController(PlannerControllerBase):
         rospy.loginfo("Cost of replanning policy is: {}".format(replanPathCost))
         rospy.loginfo("Cost of the waiting policy is: {}".format(waitPolicyCost))
         rospy.loginfo("Path-cost of the waiting path is: {}".format(waitPathCost))
-        rospy.loginfo("Cost of waiting is: {}".format(waitCost))
+        rospy.loginfo("Cost of waiting is: {}".format(totalWaitCost))
         rospy.loginfo("Threshold lambda value: {}".format(thresholdLambda))
 
         # If waiting cost is lower then wait else replan
