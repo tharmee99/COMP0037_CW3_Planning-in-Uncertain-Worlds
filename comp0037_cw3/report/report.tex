@@ -209,23 +209,31 @@
 			Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it starts to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). By avoiding travelling down aisle B before replanning the robot avoids traversing the extra distance to the cell marked $B_1$ which makes this approach favorable.
 			\\
 			\\
-			Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
+			Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. We also consider the policy associated with choosing to go down aisle B and then replanning down aisle C as soon as the obstacle is observed. This policy will be represented as $\pi_{K}^{3}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
 			\\
 			\\
-			Fig. \ref{fig:task1_2Figures} depicts the two possible paths that represent the two policies. The two different policies and their costs are as follows:
+			Fig. \ref{fig:task1_2Figures} depicts the two possible paths that represent the two former policies. The three different policies and their costs are as follows:
 			\begin{itemize}
-				\item Drive down aisle B and wait for the obstacle to clear. The cost of this scenario is given by the expression in Eq. (\ref{eqn:waitPolicyCostStart}).
+				\item Policy $\pi_{K}^{1}$ : Drive down aisle B and wait for the obstacle to clear. The cost of this scenario is given by the expression in Eq. (\ref{eqn:waitPolicyCostStart}).
 				\begin{equation}
 				L(\pi_k^1) = L_{IB_1}+TL_W+L_{B_1B}+L_{BC}+L_{CG}
 				\label{eqn:waitPolicyCostStart}
 				\end{equation}
-				\item Completely avoid aisle B and traverse directly to the goal via aisle C. It is known that no obstacle exists on this aisle. The cost for this policy is given in Eq. (\ref{eqn:aisleCPolicyCostStart}).
+				\item Policy $\pi_{K}^{2}$ : Completely avoid aisle B and traverse directly to the goal via aisle C. It is known that no obstacle exists on this aisle. The cost for this policy is given in Eq. (\ref{eqn:aisleCPolicyCostStart}).
 				\begin{equation}
 				L(\pi_k^2) = L_{IC}+L_{CG}
 				\label{eqn:aisleCPolicyCostStart}
 				\end{equation}
+				\item Policy $\pi_{K}^{3}$ : Choose to go down aisle B and then replan down aisle C as soon as the obstacle is observed. The cost of this policy is given in Eq. (\ref{eqn:replanPolicyCostStart})
+				\begin{equation}
+				L(\pi_k^2) = L_{IB_1}+L_{B_1C}+L_{CG}
+				\label{eqn:replanPolicyCostStart}
+				\end{equation}
 			\end{itemize}
 			
+			Comparing the costs for policies $\pi_{K}^{2}$ and $\pi_{K}^{3}$ (given by Eq. (\ref{eqn:aisleCPolicyCostStart}) and Eq. (\ref{eqn:replanPolicyCostStart}) respectively), we can see that they only differ by only a few terms. Whereas $\pi_{K}^{2}$ goes directly down aisle C, $\pi_{K}^{3}$ first attempts to go down aisle B. This results in $\pi_{K}^{2}$ having the cost $L_{IC}$ to get to aisle C while $\pi_{K}^{2}$ has the cost $L_{IB_1}+L_{B_1C}$ to get to aisle C. As $L_{IC}$ is the cost of the best path, $L_{IC} \leq L_{IB_1}+L_{B_1C}$. Therefore we may ignore policy $\pi_{K}^{3}$ as the robot will always pick policy $\pi_{K}^{2}$ over policy $\pi_{K}^{3}$.
+			\\
+			\\
 			As we are concerned with the average case scenario we compare the expected value of the loss function just as we did in section \ref{sec:policySelectionWhenObstacleIsObserved}. Policy $\pi_{K}^{2}$ will be chosen over policy $\pi_{K}^{1}$ if the expected value of it's cost is lower as shown by Eq. (\ref{eqn:expectationInequality}).
 			
 			\begin{equation}
@@ -316,7 +324,7 @@
 				
 				\item Policy $\pi_{K}^{3}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C it observes another obstacles so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
 					\begin{equation}
-						\mathbb{E}\left[L\left(\pi_{K}^{3}\right)\right] = L_{IB_1} + L_{B_1C_1} + L_{C_1} + L_{DG}
+						\mathbb{E}\left[L\left(\pi_{K}^{3}\right)\right] = L\left(\pi_{K}^{3}\right) = L_{IB_1} + L_{B_1C_1} + L_{C_1} + L_{DG}
 					\label{eqn:policyThreeCost}
 					\end{equation}
 					
@@ -328,13 +336,13 @@
 					
 				\item Policy $\pi_{K}^{5}$ : The robot goes down aisle C and observes an obstacle so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
 					\begin{equation}
-						\mathbb{E}\left[L\left(\pi_{K}^{5}\right)\right] = L_{IC_1} + L_{C_1D} + L_{DG}
+						\mathbb{E}\left[L\left(\pi_{K}^{5}\right)\right] = L\left(\pi_{K}^{5}\right) = L_{IC_1} + L_{C_1D} + L_{DG}
 					\label{eqn:policyFiveCost}
 					\end{equation}
 				
 				\item Policy $\pi_{K}^{6}$ : The robot directly goes down aisle D which is known to have no obstacles and avoids both aisles B and C. The expected cost for this policy is given by:
 					\begin{equation}
-						\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = L_{ID} + L_{DG}
+						\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = L\left(\pi_{K}^{6}\right) = L_{ID} + L_{DG}
 					\label{eqn:policySixCost}
 					\end{equation}
 			\end{itemize}
@@ -349,31 +357,50 @@
 			\label{eqn:minimumExpectation}
 			\end{equation}
 	
+			We can see that some of these policies have common terms. For example we may have a look at policies $\pi_{K}^{2}$ and $\pi_{K}^{4}$. $\pi_{K}^{4}$ will be picked over $\pi_{K}^{2}$ if the following inequality holds:
+	
+			\begin{equation}
+			\begin{split}
+				\mathbb{E}\left[L\left(\pi_{K}^{4}\right)\right] &\leq \mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right] \\
+				L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG} &\leq L_{IB_1} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG} \\
+				L_{IC_1} &\leq L_{IB_1} + L_{B_1C_1}
+			\end{split}
+			\label{eqn:eliminatingPolicy2}
+			\end{equation}
+	
+			As we know that $L_{IC_1}$ represents the minimum path cost from $I$ to $C_1$, the inequality in Eq. (\ref{eqn:eliminatingPolicy2}) is true. This results in the robot always picking $\pi_{K}^{4}$ over $\pi_{K}^{2}$. We can therefore ignore policy $\pi_{K}^{2}$. Similarly the robot will always pick $\pi_{K}^{6}$ over $\pi_{K}^{3}$ and $\pi_{K}^{5}$. Therefore we can ignore both policies $\pi_{K}^{3}$ and $\pi_{K}^{5}$. We have therefore simplified the inequality in Eq. (\ref{eqn:minimumExpectation}) as follows:
+			
+			\begin{equation}
+			\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = \min_{n=1,4,6} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
+			\label{eqn:minimumExpectationSimplified}
+			\end{equation}
+	
 			We start by comparing the policies $\pi_{K}^{1}$ and $\pi_{K}^{6}$. If $\pi_{K}^{6}$ is chosen between the two, then the following inequality must hold:
 			
 			\begin{equation}
-				 \mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG}
+				 L\left(\pi_{K}^{6}\right) \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG}
 			\label{eqn:policyOneInequlaity}
 			\end{equation}
 			
-			Similarly to choose $\pi_{K}^{6}$ over $\pi_{K}^{2}$ the inequality in Eq. (\ref{eqn:policyTwoInequlaity}) must hold:
+			Similarly to choose $\pi_{K}^{6}$ over $\pi_{K}^{4}$ the inequality in Eq. (\ref{eqn:policyFourInequlaity}) must hold:
 			
 			\begin{equation}
-				 \mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
-			\label{eqn:policyTwoInequlaity}
+				 L\left(\pi_{K}^{6}\right) \leq L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+			\label{eqn:policyFourInequlaity}
 			\end{equation}
 			
-			by comparing the two inequalities in Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyTwoInequlaity}) we can see that even though there are some terms that are common, it is difficult to merge the two into one inequality. However, by using logic, we may derive an upper bound for the path cost of $\pi_{K}^{6}$. From Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyTwoInequlaity}) we can obtain the following inequality which will also hold:
+			The maximum value the $L\left(\pi_{K}^{6}\right)$ for policy $\pi_{K}^{6}$ to be chosen is either that given by Eq. (\ref{eqn:policyOneInequlaity}) or by Eq. (\ref{eqn:policyOneInequlaity}) whichever one is smaller. The inequalities cannot be merged to find the exact maximum value for the maximum path cost.  However, by using logic, we may derive an upper bound for the path cost of $\pi_{K}^{6}$. From Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyFourInequlaity}) we can obtain the following inequality which will also hold:
 			
 			\begin{equation}
-				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
+				\begin{split}
+					L\left(\pi_{K}^{6}\right) &\leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG} + L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} \\
+					L\left(\pi_{K}^{6}\right) &\leq L_{IB_1} + L_W(\frac{p_B}{\lambda_{B}} + \frac{p_C}{\lambda_{C}}) + L_{B_1B} + L_{BC} + L_{CG} + L_{IC_1} + L_{C_1C}
+				\end{split}
+				\label{eqn:finalInequality}
 			\end{equation}
 			
-			Here we use the fact that if $A<B+C$ is true and $A<B+D$ is true then it must also follow that $A<B+C+D$. We can use this idea to compile the inequalities comparing each of the 5 policies to $\pi_{K}^{6}$ into one single inequality:
+			Values for $\mathbb{E}_{B}\left[T\right]$ and $\mathbb{E}_{C}\left[T\right]$ were taken from Eq. (\ref{eqn:expectedWaitTimeBC}). Here we use the fact that if $A<B+C$ is true and $A<B+D$ is true then it must also follow that $A<B+C+D$. It should be noted that this is not the maximum value for $L\left(\pi_{K}^{6}\right)$ for which policy $\pi_{K}^{6}$ is chosen but rather the upper bound estimation for that value.
 			
-			\begin{equation}
-				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq L_{IB_1} + \mathbb{E}_{B}\left[T\right]L_W + L_{B_1B} + L_{BC} + L_{CG} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L{C_1D} + L_{DG} + L_{IC_1} + L_{ID}
-			\end{equation}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%%%%%%%%%% PART 2 %%%%%%%%%%%%%%%%%
