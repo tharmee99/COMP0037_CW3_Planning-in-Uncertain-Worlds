@@ -164,15 +164,15 @@ class ReactivePlannerController(PlannerControllerBase):
     # Aisle Midpoints are computed to use as waypoints to plan paths to
     def getAisleMidpoint(self, aisle):
         if (aisle == Aisle.A):
-            return (6.25,8.375)
+            return (6.25,6.375)
         elif (aisle == Aisle.B):
-            return (10.5,8.375)
+            return (10.5,6.375)
         elif (aisle == Aisle.C):
-            return (14.75,8.375)
+            return (14.75,6.375)
         elif (aisle == Aisle.D):
-            return (18.5,8.375)
+            return (18.5,6.375)
         elif (aisle == Aisle.E):
-            return (22.5,8.375)
+            return (22.5,6.375)
 
 
     # Plan a path to the goal which will go down the designated aisle. The code, as
