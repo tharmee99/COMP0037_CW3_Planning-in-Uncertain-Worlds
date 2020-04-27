@@ -155,7 +155,7 @@ class ReactivePlannerController(PlannerControllerBase):
                 break
 
             # Verbosity overdrive
-            print("Waiting for obstacle to clear...")
+            print("Waiting for obstacle to clear. Waited {}s".format(rospy.get_time() - startTime))
             rospy.sleep(0.5)
 
         rospy.loginfo("Finished waiting...")
