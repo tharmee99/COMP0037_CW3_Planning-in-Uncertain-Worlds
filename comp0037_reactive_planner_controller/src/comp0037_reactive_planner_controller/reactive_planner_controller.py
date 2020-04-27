@@ -161,8 +161,8 @@ class ReactivePlannerController(PlannerControllerBase):
 
         rospy.loginfo("Finished waiting...")
         
-    # Aisle Midpoints are computed to use as waypoints to plan paths to
-    def getAisleMidpoint(self, aisle):
+    # Aisle Coordinates are computed to use as waypoints to plan paths to
+    def getAisleCellCoords(self, aisle):
         if (aisle == Aisle.A):
             return (6.25,6.375)
         elif (aisle == Aisle.B):
@@ -181,7 +181,7 @@ class ReactivePlannerController(PlannerControllerBase):
     def planPathToGoalViaAisle(self, startCellCoords, goalCellCoords, aisle, graphics = True):
 
         # Obtain aisle coords 
-        aisleWorldCoords = self.getAisleMidpoint(aisle)
+        aisleWorldCoords = self.getAisleCellCoords(aisle)
         aisleCellCoords = self.occupancyGrid.getCellCoordinatesFromWorldCoordinates(aisleWorldCoords)
 
         # Show Graphics?
