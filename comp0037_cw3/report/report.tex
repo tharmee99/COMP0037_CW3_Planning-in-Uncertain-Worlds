@@ -14,7 +14,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{booktabs}
-*********************DOCUMENT***************************************
+%*********************DOCUMENT***************************************
 
 \DeclareMathOperator*{\argmin}{\arg\!\min}
 \DeclareMathOperator*{\argmax}{\arg\!\max}
@@ -79,22 +79,12 @@
 		
 			\begin{figure}[H]
 				\centering
-				\begin{subfigure}{.4\textwidth}
 					\centering
-					\includegraphics[width=\linewidth]{originalPlannedPath.png}
+					\includegraphics[width=0.5\linewidth]{originalPlannedPath.png}
 					\caption{The original planned path form I to G going through Aisle B and C.}
 					\label{fig:originalPlannedPath}
-				\end{subfigure}
-				\begin{subfigure}{.4\textwidth}
-					\centering
-					\includegraphics[width=\linewidth]{blockedAisleB.png}
-					\caption{An obstacle in aisle B obstructs the planned path of the robot.}
-					\label{fig:blockedAisleB}
-				\end{subfigure}
-				\caption{Illustration of case where robot observes an obstruction to it's planned path.}
-				\label{fig:task1_1Figures}
 			\end{figure}
-			                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to go from a cell $I$ to a cell $G$. These cells are marked blue and green in Fig. \ref{fig:originalPlannedPath} respectively. The figure also shows the original planned path that the robot computed and this goes down aisle B. However, once the robot turns into aisle B it detects that the aisle is blocked. This observation is done at the point when the robot reaches the cell labelled $B_{1}$. At this point the robot can decide either to wait until the obstruction clears or it can re-plan a path. 
+			                                                                                                                                       The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to go from a cell $I$ to a cell $G$. These cells are marked blue and green in Fig. \ref{fig:originalPlannedPath} respectively. The figure also shows the original planned path that the robot computed and this goes down aisle B. However, once the robot turns into aisle B it detects that the aisle is blocked. This observation is done at the point when the robot reaches the cell labelled $B_{1}$. At this point the robot can decide either to wait until the obstruction clears or it can re-plan a path. 
 			                                                                                                                                       
 			If the robot decides to wait, the time the robot must wait for the obstacle to clear, after the robot detects it may be represented by Eq. (\ref{eqn:waitTime}). 
 			
@@ -118,8 +108,9 @@
 			As previously mentioned, the robot has two options to choose from: to wait for the obstacle to clear, or to re-plan and execute the new path. These are the two different policies the robot must choose from. A policy is a mapping from the world state to an action the robot can execute, given by:
 			\begin{equation}
 			\pi: \mathbf{X} \rightarrow \mathbf{U}
+			\label{policy-def}
 			\end{equation}
-			where, $\pi$ is the sumbol used to denote a policy. Eq. (\ref{policy-def})
+			where, $\pi$ is the symbol used to denote a policy. Eq. (\ref{policy-def})
 			\\
 			\\                                                                                                                                                                        
 			Let us assume that that the robot encounters the obstacle when it reaches stage $ K_O $. For the first policy $\pi_{K}^{1}$If the robot decides to wait, then then it adds $K_1$ while if the robot decides to re-plan and execute the total path length will be $K_2$. We let the quantity $K$ equal to the larger value between $K_1$ and $K_2$. Now we may write the policy for the robot to wait as $\pi_{K}^{1}$ and the policy for re-planning as $\pi_{K}^{2}$. These policies are padded correspondingly to produce actions $\textbf{u}_{K}^{1}$ and $\textbf{u}_{K}^{1}$ that are padded with zero-cost state preserving actions.
@@ -134,9 +125,17 @@
 			
 			\begin{figure}[H]
 				\centering
-				\includegraphics[scale=0.5]{images/replannedPathAisleB.png}
-				\caption{The path for the re-plan policy $\pi_{K}^{2}$ which bypasses aisle B and goes down aisle C.}
-				\label{fig:replannedPathAisleB}
+				\begin{subfigure}{.4\textwidth}
+					\centering
+					\includegraphics[width=\linewidth]{blockedAisleB.png}
+					\caption{Policy 1: The path for policy involving waiting for the obstruction to move $\pi_{K}^{1}$ and continuing via aisle B}
+					\label{fig:blockedAisleB}
+				\end{subfigure}
+				\begin{subfigure}{.4\textwidth}
+					\includegraphics[scale=0.5]{images/replannedPathAisleB.png}
+					\caption{Policy 2: The path for the re-plan policy $\pi_{K}^{2}$ which bypasses aisle B and goes down aisle C.}
+					\label{fig:replannedPathAisleB}
+				\end{subfigure}
 			\end{figure}
 			
 			We can see from Fig. \ref{fig:originalPlannedPath} that the cost of the original planned path is given by the expression in Eq. (\ref{eqn:waitingPolicyCost}). In this equation, the terms $L_{XY}$ denote the cost of the shortest path between cell $X$ and cell $Y$. Additionally, the term $L_{W}$ represents the non-zero cost of the action $\boldsymbol{u}_w$. This action is state preserving (i.e. $\boldsymbol{x}_{k+1} = f(\boldsymbol{x}_k,\boldsymbol{u}_w) = \boldsymbol{x}_k$) and is used to represent the action of the robot waiting for one unit of time.
@@ -357,7 +356,7 @@
 			We are given that the robot chooses policy $\pi_{K}^{6}$ by going straight down aisle D. This suggests that the expected cost of this policy is lower than any other policy available to the robot as suggested by Eq. (\ref{eqn:minimumExpectation})
 			
 			\begin{equation}
-				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = \min_{n=1,\dots,6} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
+				\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq \min_{n=1,\dots,5} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
 			\label{eqn:minimumExpectation}
 			\end{equation}
 	
@@ -375,7 +374,7 @@
 			As we know that $L_{IC_1}$ represents the minimum path cost from $I$ to $C_1$, the inequality in Eq. (\ref{eqn:eliminatingPolicy2}) is true. This results in the robot always picking $\pi_{K}^{4}$ over $\pi_{K}^{2}$. We can therefore ignore policy $\pi_{K}^{2}$. Similarly the robot will always pick $\pi_{K}^{6}$ over $\pi_{K}^{3}$ and $\pi_{K}^{5}$. Therefore we can ignore both policies $\pi_{K}^{3}$ and $\pi_{K}^{5}$. We have therefore simplified the inequality in Eq. (\ref{eqn:minimumExpectation}) as follows:
 			
 			\begin{equation}
-			\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] = \min_{n=1,4,6} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
+			\mathbb{E}\left[L\left(\pi_{K}^{6}\right)\right] \leq \min_{n=1,4} \mathbb{E}\left[L\left(\pi_{K}^{n}\right)\right]
 			\label{eqn:minimumExpectationSimplified}
 			\end{equation}
 	
@@ -493,44 +492,6 @@
 			\end{equation}
 		
 		
-	\subsection{Policy Selection at Start}
-	\label{sec:policySelectionAtStartROS}
-	
-	Some implementation have the robot decide which aisle is most favourable before the execution of any path has started. This approach is discussed in \S \ref{sec:policySelectionAtStart}. The robot will utilize prior knowledge of the environment and the nature/location of the obstacles to make an informed decision as to which aisle minimizes the average wait time. The nature of the environment is fully characterized by the map available to the robot (shown in Fig. \ref{fig:stdrMap}). The location of the obstacles is fixed: there is one obstacle in aisle B. The nature of this obstacle is fully characterized by the probability of the obstacle being present $p_B$ and the parameter $\lambda_B$. From these two parameters the expected wait time of the obstacle can be found to be equal to $p_B/\lambda_B$ as shown in Eq. (\ref{eqn:expectedWaitTimeProbability}).
-	\\
-	\\
-	Policy selection at the beginning was achieved by modifying the \textbf{\texttt{chooseInitialAisle}} method of the \textbf{\texttt{ReactivePlannerController}} class. If a particular aisle is favourable by the operator then this can be set as a ROS parameter in the launch script and the robot will choose this aisle as the first aisle. However, if the ROS parameter does not exist, the algorithm will proceed to plan a path to the goal via each of the available aisles and compare the policy costs. The planning of paths via a specified aisle is done by calling the previously implemented \texttt{\textbf{planPathToGoalViaAisle}} method. Once the paths are planned, the path cost of each of the paths is stored. To the path cost of aisle B the expected cost of waiting is added on by implementing the equation shown in Eq. (\ref{eqn:expectedWaitTimeCost}). The cost of waiting one unit of time $L_W$ is taken to be $2$ and the parameter $p_B$ is taken to be $0.8$. All of these parameters as well as $\lambda_B$ can be set in the launch files as they are red from ROS parameters.
-	
-	\begin{equation}
-	\mathbb{E}[L_{wait}]=L_W \cdot \frac{p_B}{\lambda_B}
-	\label{eqn:expectedWaitTimeCost}
-	\end{equation}
-	
-	Once the policy costs of the paths via each aisle has been computed, the best policy is chosen as the one with the lowest cost. For an instance of running the STDR simulation in ROS, we obtained the path costs for paths via each of the aisles shown in Table \ref{tab:pathAndPolicyCostSimulations}. We can see that the shortest two paths are the one via aisle B and aisle C. Even though the path via aisle B is the shorter on, in the case when $\lambda_B=1$, the policy cost of the path via aisle B becomes larger than that via aisle C. We can compute the threshold value of $\lambda_B$ using the expression found in Eq. (\ref{eqn:probabilityInequality1}). We produce the equation in Eq. (\ref{eqn:thresholdLambdaAtStart}). $p_b$ is taken to $0.8$ and $L_W$ is taken to be $2$. This inequality shows the constraint of $\lambda_B$ for which the robot will plan directly via aisle C.
-	
-	\begin{equation}
-	\begin{split}
-	\lambda_B &\leq \frac{L_W}{p_B(PathCost_{aisleC} - PathCost_{aisleB})} \\
-	\lambda_B &\leq \frac{2}{0.8(115.50 - 114.91)} \\
-	\lambda_B &\leq 4.24
-	\end{split}
-	\label{eqn:thresholdLambdaAtStart}
-	\end{equation}
-	
-	\begin{table}[H]
-		\centering
-		\begin{tabular}{@{}l|ll@{}}
-			\toprule
-			Aisle & Path Cost & Policy Cost \\ \midrule
-			A     & 116.43          & 116.43            \\
-			B     & 114.91          & 116.51            \\
-			C     & 115.50          & 115.50            \\
-			D     & 124.28          & 124.28            \\
-			E     & 117.31          & 117.31            \\ \bottomrule
-		\end{tabular}
-		\caption{Path cost of path planned to goal from the start via each of the available aisles. The policy costs are also given. $\lambda_B=1$ and $p_B=0.8$ in this scenario.}
-		\label{tab:pathAndPolicyCostSimulations}
-	\end{table}
 		
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\newpage
