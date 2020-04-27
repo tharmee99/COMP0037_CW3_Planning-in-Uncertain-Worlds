@@ -22,7 +22,6 @@ class ReactivePlannerController(PlannerControllerBase):
         self.aisleToDriveDown = None
 
         self.exportDirectory = None
-
         self.initialPlanFlag = True
 
     def mapUpdateCallback(self, mapUpdateMessage):
@@ -119,7 +118,7 @@ class ReactivePlannerController(PlannerControllerBase):
         # Computing the cost of current cell to start cell
         tempPlanner.search(self.currentPlannedPath.waypoints[0].coords, startCellCoords)
         pathToStart = tempPlanner.extractPathToGoal()
-        time.sleep(1)
+
         # Computing the cost of waiting, the expected value for the wait time is given as 1/lambda
         totalWaitCost =  self.waitCost*(1/self.aisleBwaitLambda)
         waitPathCost = self.currentPlannedPath.travelCost - pathToStart.travelCost
