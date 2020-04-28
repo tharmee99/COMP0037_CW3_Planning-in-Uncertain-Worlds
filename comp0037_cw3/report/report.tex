@@ -331,19 +331,19 @@
 				\label{eqn:policyOneCost}
 				\end{equation}
 				
-				\item Policy $\pi_{K}^{2}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C it observes another obstacle and waits for it to clear before continuing to the goal. The expected cost for this policy is given by:
+				\item Policy $\pi_{K}^{2}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C, it observes another obstacle and waits for it to clear before continuing to the goal. The expected cost for this policy is given by:
 				\begin{equation}
 				\mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right] = L_{IB_1} + L_{B_1C_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
 				\label{eqn:policyTwoCost}
 				\end{equation}
 				
-				\item Policy $\pi_{K}^{3}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C it observes another obstacle, so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
+				\item Policy $\pi_{K}^{3}$ : The robot goes down aisle B and observes an obstacle so re-plans down aisle C. While travelling down aisle C, it observes another obstacle, so it re-plans down aisle D which is known to have no obstacles. The expected cost for this policy is given by:
 				\begin{equation}
 				\mathbb{E}\left[L\left(\pi_{K}^{3}\right)\right] = L\left(\pi_{K}^{3}\right) = L_{IB_1} + L_{B_1C_1} + L_{C_1} + L_{DG}
 				\label{eqn:policyThreeCost}
 				\end{equation}
 				
-				\item Policy $\pi_{K}^{4}$ : The robot goes down aisle C and observes an obstacle so it waits for the obstacle to clear before continuing to the goal. The expected cost for this policy is given by:
+				\item Policy $\pi_{K}^{4}$ : The robot goes down aisle C and observes an obstacle, so it waits for the obstacle to clear before continuing to the goal. The expected cost for this policy is given by:
 				\begin{equation}
 				\mathbb{E}\left[L\left(\pi_{K}^{4}\right)\right] = L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
 				\label{eqn:policyFourCost}
@@ -404,7 +404,7 @@
 				\label{fig:policyDiagrams}
 			\end{figure}
 			
-			We ignore the case of going down aisle A and aisle E as these will inherently have a larger path length due to the topology of the example scenario. Additionally, back-tracking of aisles is also ignored (e.g. going from aisle C back to aisle B) as this would also have larger costs than those considered above.
+			Note that, here we ignore the cases of going down aisle A and aisle E as these will inherently have a larger path length due to the topology of the example scenario. Additionally, back-tracking of aisles is also ignored (e.g. going from aisle C back to aisle B) as this would also have larger costs than those considered above.
 			\\
 			\\
 			We are given that the robot chooses policy $\pi_{K}^{6}$ by going straight down aisle D. This suggests that the expected cost of this policy is lower than any other policy available to the robot as suggested by Eq. (\ref{eqn:minimumExpectation})
@@ -417,7 +417,7 @@
 			\label{eqn:minimumExpectation}
 			\end{equation}
 			
-			We can see that some of these policies have common terms. For example we may have a look at policies $\pi_{K}^{2}$ and $\pi_{K}^{4}$. $\pi_{K}^{4}$ will be picked over $\pi_{K}^{2}$ if the following inequality holds:
+			We can see that some of these policies have common terms. For example, we may have a look at policies $\pi_{K}^{2}$ and $\pi_{K}^{4}$. $\pi_{K}^{4}$ will be picked over $\pi_{K}^{2}$ if the following inequality holds:
 			
 			\begin{equation}
 			\begin{split}
@@ -428,7 +428,7 @@
 			\label{eqn:eliminatingPolicy2}
 			\end{equation}
 			
-			As we know that $L_{IC_1}$ represents the minimum path cost from $I$ to $C_1$, the inequality in Eq. (\ref{eqn:eliminatingPolicy2}) is true. This results in the robot always picking $\pi_{K}^{4}$ over $\pi_{K}^{2}$. We can therefore ignore policy $\pi_{K}^{2}$. The exact argument involving an inequality similar to Eq. (\ref{eqn:eliminatingPolicy2}), can be used to show that the robot will always pick $\pi_{K}^{6}$ over $\pi_{K}^{3}$ and $\pi_{K}^{5}$. Therefore, we can also ignore policies $\pi_{K}^{3}$ and $\pi_{K}^{5}$. We therefore now have, simplified the inequality in Eq. (\ref{eqn:minimumExpectation}) as shown in Eq. (\ref{eqn:minimumExpectationSimplified}).
+			As we know that $L_{IC_1}$ represents the minimum path cost from $I$ to $C_1$, the inequality in Eq. (\ref{eqn:eliminatingPolicy2}) is true. This results in the robot always picking $\pi_{K}^{4}$ over $\pi_{K}^{2}$. We can therefore ignore policy $\pi_{K}^{2}$. The exact argument involving an inequality similar to Eq. (\ref{eqn:eliminatingPolicy2}), can be used to show that the robot will always pick $\pi_{K}^{6}$ over $\pi_{K}^{3}$ and $\pi_{K}^{5}$. Therefore, we can also ignore policies $\pi_{K}^{3}$ and $\pi_{K}^{5}$. We therefore now have, simplified the inequality given by Eq. (\ref{eqn:minimumExpectation}) as shown in Eq. (\ref{eqn:minimumExpectationSimplified}).
 			
 			\begin{equation}
 			\begin{split}
@@ -438,7 +438,7 @@
 			\label{eqn:minimumExpectationSimplified}
 			\end{equation}
 			
-			We now attempt to try and reduce this further by similar comparisons. However, lack of knowledge of the values of $ \lambda_B $ and $ \lambda_C $ prevents us from reducing or drawing comparison between these costs further. However, we would highlight it beforehand that the attempt below involves combining 2 inequalities to give an absolute upper bound value which may not represent a policy (or path) that has a meaning in reality.
+			We now attempt to try and reduce this further by similar comparisons. However, lack of knowledge of the values of $ \lambda_B $ and $ \lambda_C $ or the relationship between them, prevents us from reducing or drawing comparison between these costs further. However, we would like highlight in advance that the attempt below involves combining 2 inequalities to give an absolute upper bound value which may not represent a policy (or path) that has a meaning in reality.
 			
 			We start by comparing the policies $\pi_{K}^{1}$ and $\pi_{K}^{6}$. If $\pi_{K}^{6}$ is chosen between the two, then the following inequality must hold:
 			
@@ -447,14 +447,14 @@
 			\label{eqn:policyOneInequlaity}
 			\end{equation}
 			
-			Similarly to choose $\pi_{K}^{6}$ over $\pi_{K}^{4}$ the inequality in Eq. (\ref{eqn:policyFourInequlaity}) must hold:
+			Similarly, to choose $\pi_{K}^{6}$ over $\pi_{K}^{4}$ the inequality in Eq. (\ref{eqn:policyFourInequlaity}) must hold:
 			
 			\begin{equation}
 			L\left(\pi_{K}^{6}\right) \leq L_{IC_1} + \mathbb{E}_{C}\left[T\right]L_W + L_{C_1C} + L_{CG}
 			\label{eqn:policyFourInequlaity}
 			\end{equation}
 			
-			The maximum value the $L\left(\pi_{K}^{6}\right)$ for policy $\pi_{K}^{6}$ to be chosen is either given by Eq. (\ref{eqn:policyOneInequlaity}) or by Eq. (\ref{eqn:policyOneInequlaity}) whichever one is smaller. The inequalities cannot be merged to find the exact maximum value for the maximum path cost.  However, by using logic, we may derive an upper bound for the path cost of $\pi_{K}^{6}$. From Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyFourInequlaity}) we can obtain the inequality shown in Eq. (\ref{eqn:finalInequality}) which will also hold. It should be noted that this inequality does not express the maximum value for $L\left(\pi_{K}^{6}\right)$ for which policy $\pi_{K}^{6}$ is chosen but rather the upper bound estimation for that value. The actual upper bound of the cost of policy $\pi_{K}^{6}$ is expressed in Eq. (\ref{eqn:minimumExpectationSimplified}) as $\pi_{K}^{1}$ or $\pi_{K}^{4}$ whichever is smaller.
+			The maximum value of $L\left(\pi_{K}^{6}\right)$ for policy $\pi_{K}^{6}$ to be chosen is either given by Eq. (\ref{eqn:policyOneInequlaity}) or by Eq. (\ref{eqn:policyOneInequlaity}) whichever one is smaller. The inequalities cannot be compared to find the exact maximum value for the maximum path cost.  However, by using logic, we may derive an upper bound for the path cost of $\pi_{K}^{6}$. From Eq. (\ref{eqn:policyOneInequlaity}) and Eq. (\ref{eqn:policyFourInequlaity}) we can obtain the inequality shown in Eq. (\ref{eqn:finalInequality}) which will also hold. It should be noted that this inequality does not express the maximum value for $L\left(\pi_{K}^{6}\right)$ for which policy $\pi_{K}^{6}$ is chosen but rather the upper bound estimation for that value. The actual upper bound of the cost of policy $\pi_{K}^{6}$ is expressed in Eq. (\ref{eqn:minimumExpectationSimplified}) as $\pi_{K}^{1}$ or $\pi_{K}^{4}$ whichever is smaller.
 			
 			\begin{equation}
 			\begin{split}
