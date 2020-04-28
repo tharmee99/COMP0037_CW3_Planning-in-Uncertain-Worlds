@@ -76,7 +76,7 @@ class ReactivePlannerController(PlannerControllerBase):
             aisles[1][1] += totalWaitCost
 
             # Computing the threshold lambda value to choose C over B
-            thresholdLambda = self.waitCost/(self.aisleBObstacleProbability*(aisles[2][1] - aisleBPathCost))
+            thresholdLambda = (self.aisleBObstacleProbability*self.waitCost)/(aisles[2][1] - aisleBPathCost)
 
             # verbosity
             for aisle in aisles:
