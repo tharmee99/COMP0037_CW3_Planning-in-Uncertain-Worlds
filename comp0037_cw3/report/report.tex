@@ -93,14 +93,16 @@
 				\label{fig:task1_1Figures}
 			\end{figure}
 			
-			The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to go from a cell $I$ to a cell $G$. These cells are marked blue and green in Fig. \ref{fig:originalPlannedPath} respectively. The figure also shows the original planned path that the robot computed going down aisle B. However, once the robot turns into aisle B it observes that the aisle is blocked. This observation is done at the point when the robot reaches the cell labelled $B_{1}$. At this point the robot can either decide to wait until the obstruction clears or it can re-plan a path. Once the robot observes the obstacle, the time the robot must wait for the obstacle to clear may be represented by the expression in Eq. (\ref{eqn:waitTime}). 
+			The scenario that we will be analysing is the case shown in Fig. \ref{fig:originalPlannedPath}. The robot is required to to plan a path from cell $I$ to cell $G$ that are marked as blue and green in Fig. \ref{fig:originalPlannedPath} respectively. This figure also shows the path originally planned by the robot and it can be seen that it goes down via aisle B assuming it has no knowledge of any dynamic obstacles that may be present in the environment yet. However, once the robot turns into aisle B and reaches cell $ B_1 $, it observes that the aisle is blocked. At this point, the robot can either decide to wait until the obstruction clears or it can re-plan its path. 
+			
+			If the robot is to wait, the time that the robot must wait for the obstacle to clear \footnote{This time is calculated from the moment the obstacle was detected} is represented by Eq. (\ref{eqn:waitTime}) as: 
 			
 			\begin{equation}
 			T=\frac{0.5}{\lambda_{B}}+\widetilde{T}
 			\label{eqn:waitTime}
 			\end{equation}
 			
-			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from a exponential distribution with a rate parameter of $2\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. (\ref{eqn:waitTimePDF}). 
+			The wait time is dependent on $\lambda_{B}$ and a random variable $\widetilde{T}$. The random variable $\widetilde{T}$ is sampled from an exponential distribution with a rate parameter of $2\lambda_{B}$. The probability density function (PDF) for $\widetilde{T}$ is shown in Eq. (\ref{eqn:waitTimePDF}). 
 			
 			\begin{equation}
 			f(t) = 
@@ -111,8 +113,9 @@
 			\label{eqn:waitTimePDF}
 			\end{equation}
 			where, the rate parameter $\lambda = 2\lambda_{B}$. 
-			
-			As previously mentioned, the robot has two options to choose from: to wait for the obstacle to clear, or to re-plan and execute the new path. The two are different policies the robot must choose from. We use the symbol $\pi$ to denote a policy. A policy is a mapping from the world state to an action the robot can execute. A policy is a mapping from the world state to an action set the robot can execute, given by:
+			\\
+			\\
+			As previously mentioned, the robot has two options to choose from: to wait for the obstacle to clear, or to re-plan and execute the new path. These are the two different policies the robot must choose from. We use the symbol $\pi$ to denote a policy. A policy is a mapping from the world state to an action set the robot can execute, given by:
 			
 			\begin{equation}
 				\pi: \mathbf{X} \rightarrow \mathbf{U}
@@ -121,10 +124,10 @@
 			where, $\pi$ is the symbol used to denote a policy. Eq. (\ref{policy-def})
 			\\
 			\\
-			Let us assume that if the robot decides to wait the total path length (number of cells) will be $K_1$ while if the robot decides to re-plan and execute the total path length will be $K_2$. We let the quantity $K$ equal to the larger value between $K_1$ and $K_2$. Now we may write the policy for the robot to wait as $\pi_{K}^{1}$ and the policy for re-planning as $\pi_{K}^{2}$. These policies are padded correspondingly to produce actions $\textbf{u}_{K}^{1}$ and $\textbf{u}_{K}^{1}$ that are padded with zero-cost state preserving actions.
+			We know the robot detects the obstacle when it reaches cell $ B1 $. Let us assume that to reach cell $ B1 $ it took $ K_O $ stages. If the robot chooses to wait for the obstacle to clear, then lets say this adds $ K_1 $ stages. On the other hand, if it chooses to re-plan the route via aisle C then lets say that this would add $K_2$ stages. Following these notations, the policy for the robot to wait is denoted as $\pi_{K}^{1}$ and the policy for re-planning is denoted as $\pi_{K}^{2}$ in this section. Note that, these policies are padded out with zero-cost actions up till $ K_1 $/$ K_2 $ stages and only account for actions $\textbf{u}_{K}^{1}$ and $\textbf{u}_{K}^{2}$ that are to be executed further.
 			\\
 			\\
-			To see which policy is better on average, we consider the expected value of the cost function for both cases. The case when policy $\pi_{K}^{1}$ is chosen is characterized by the inequality shown in Eq. (\ref{eqn:costExpectation}).
+			To decide which policy is better on average, the robot considers the expected value of the cost function for all the different policies and chooses the one with the lowest cost. In the given case, for policy $\pi_{K}^{1}$ to be chosen, the inequality characterised by Eq. (\ref{eqn:costExpectation}) must be true.
 			
 			\begin{equation}
 			\mathbb{E}\left[L\left(\pi_{K}^{1}\right)\right] \leq \mathbb{E}\left[L\left(\pi_{K}^{2}\right)\right]
@@ -149,21 +152,23 @@
 				\label{fig:policiesMaps}
 			\end{figure}
 
-			We can see from Fig. \ref{fig:originalPlannedPath} that the cost of the original planned path is given by the expression in Eq. (\ref{eqn:waitingPolicyCost}). In this equation, the terms $L_{XY}$ denote the cost of the shortest path between cell $X$ and cell $Y$. Additionally, the term $L_{W}$ represents the non-zero cost of the action $\boldsymbol{u}_w$. This action is state preserving (i.e. $\boldsymbol{x}_{k+1} = f(\boldsymbol{x}_k,\boldsymbol{u}_w) = \boldsymbol{x}_k$) and is used to represent the action of the robot waiting for one unit of time.
+			We can see from Fig. \ref{fig:originalPlannedPath} that the cost of the original planned path is given by the expression in Eq. (\ref{eqn:waitingPolicyCost}). In this equation, the terms $L_{XY}$ denote the cost of the shortest path between cell $X$ and cell $Y$. Additionally, the term $L_{W}$ represents the non-zero cost of the action $\boldsymbol{u}_w$. This action is state preserving (i.e. $\boldsymbol{x}_{k+1} = f(\boldsymbol{x}_k,\boldsymbol{u}_w) = \boldsymbol{x}_k$) and is used to represent the action of the robot waiting for one unit of time. 
+			
+			Therefore, the cost of waiting for the obstacle to clear is:
 			
 			\begin{equation}
 			L\left(\pi_{K}^{1}\right) = L_{IB_{1}} + TL_W + L_{B_{1}B} + L_{BC} + L_{CG}
 			\label{eqn:waitingPolicyCost}
 			\end{equation}
 			
-			From Fig. \ref{fig:replannedPathAisleB} which shows the re-planned path, we can also see that the cost of this path is equal to the expression in Eq. (\ref{eqn:replanPolicyCost})
+			Similarly from Fig. \ref{fig:replannedPathAisleB} which shows the re-planned path, we can derive the cost of this path as:
 			
 			\begin{equation}
 			L\left(\pi_{K}^{2}\right) = L_{IB_{1}} + L_{B_{1}C_{1}} + L_{C_{1}C} + L_{CG}
 			\label{eqn:replanPolicyCost}
 			\end{equation}
 			
-			Substituting the expressions in Eq. (\ref{eqn:waitingPolicyCost}) and Eq. (\ref{eqn:replanPolicyCost}) into Eq. (\ref{eqn:costExpectation}). We obtain the inequality shown in Eq. (\ref{eqn:costExpectation1})
+			Now, by substituting Eq. (\ref{eqn:waitingPolicyCost}) and Eq. (\ref{eqn:replanPolicyCost}) into Eq. (\ref{eqn:costExpectation}), we obtain the inequality shown in Eq. (\ref{eqn:costExpectation1}).
 			
 			\begin{equation}
 			\begin{split}
@@ -174,7 +179,7 @@
 			\label{eqn:costExpectation1}
 			\end{equation}
 			
-			The quantity $\mathbb{E}\left[T\right]$ is the expected value for the time the robot has to wait for the obstacle to clear. As we know the distribution that the variable is sampled from we can compute the expected value. The expected value for the time taken is given by the expression found in Eq. (\ref{eqn:waitTimeExpectation})
+			The quantity $\mathbb{E}\left[T\right]$ is the expected mean value of the time the robot has to wait for the obstacle to clear. We can compute the expected value for this wait time as the mean of the function represented by Eq. (\ref{eqn:waitTime}). Then, the expected value for the time taken can be computed as follows:
 			
 			\begin{equation}
 			\begin{split}
@@ -189,7 +194,7 @@
 			\label{eqn:waitTimeExpectation}
 			\end{equation}
 			
-			Substituting the expression from Eq. (\ref{eqn:waitTimeExpectation}) into Eq. (\ref{eqn:costExpectation1}) we obtain the inequality in Eq. (\ref{eqn:lambdaInequality}). The right-hand side of the inequality in Eq. (\ref{eqn:lambdaInequality}) represents the smallest possible value for $\lambda_{B}$ for which the waiting policy $\pi_K^1$ is a better option than the re-plan policy $\pi_K^2$. The inequality also takes into consideration the constraint that $\lambda_{B} > 0$ and negates the solution when $\lambda_{B} < 0$.
+			Substituting the expression from Eq. (\ref{eqn:waitTimeExpectation}) into Eq. (\ref{eqn:costExpectation1}) we obtain the inequality in Eq. (\ref{eqn:lambdaInequality}). This inequality also takes into consideration the constraint that $\lambda_{B} > 0$ and negates the solution when $\lambda_{B} < 0$.
 			
 			\begin{equation}
 			\begin{split}
@@ -198,6 +203,8 @@
 			\end{split}
 			\label{eqn:lambdaInequality}
 			\end{equation}
+			
+			Therefore, from Eq. (\ref{eqn:lambdaInequality}) we get that the smallest possible value for $\lambda_{B}$ for which the waiting policy $\pi_K^1$ is a better option than the re-plan policy $\pi_K^2$ is $ \frac{L_W}{L_{B_{1}C_{1}} + L_{C_{1}C} - L_{B_{1}B} - L_{BC}} $.
 		
 		\subsection{Policy Selection at Start}
 		\label{sec:policySelectionAtStart}
@@ -220,13 +227,10 @@
 				\label{fig:task1_2Figures}
 			\end{figure}
 			
-			Instead of reacting to the obstacle as the robot observes it, the robot may also make a decision before it starts to move. The robot has knowledge of where the obstacles will be and the probability distribution for the wait time. Depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going the route with the obstacle and wait. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies are to choose to travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly along aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). By avoiding travelling down aisle B before replanning the robot avoids traversing the extra distance to the cell marked $B_1$ which makes this approach favourable.
+			In the previous scenario, the robot reacted to the obstacle after detecting it upon reaching cell $ B_1 $. However, if the robot has prior knowledge of the probability that an obstacle might be present at aisle B, then the robot may make the decision of whether it should avoid aisle B right at the start before it moves. So given that, the robot has knowledge of where there are potential obstacles and the associated probability distribution for the wait times at these obstacles, a decision can be made at the start on whether or not to avoid that aisle. This could mean that depending on the probabilities involved, the robot may decide to avoid the obstacle altogether instead of going through the route and having to react. In the case of the warehouse example with 5 aisles, and one obstacle in aisle B, the two policies that the robot can choose from are: travel down aisle B and wait if an obstacle is present (illustrated in Fig. \ref{fig:plannedPathAisleB}) or to avoid aisle B and plan directly via aisle C (illustrated in Fig. \ref{fig:plannedPathAisleC}). This approach is favourable especially as it avoids the robot from having to traverse the extra distance to the cell marked $B_1$ in the case when waiting at obstacle B is a more unfavourable option.
 			\\
 			\\
-			Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy that goes down aisle B as $\pi_{K}^{1}$ and the policy that goes down aisle C as $\pi_{K}^{2}$. We also consider the policy associated with choosing to go down aisle B and then replanning down aisle C as soon as the obstacle is observed. This policy will be represented as $\pi_{K}^{3}$. Once again these are padded with zero-cost state preserving actions so as to be of the same dimension. 
-			\\
-			\\
-			Fig. \ref{fig:task1_2Figures} depicts the two possible paths that represent the two former policies. The three different policies and their costs are as follows:
+			Similar to the approach in \S \ref{sec:policySelectionWhenObstacleIsObserved}, we may denote the policy of going down aisle B and waiting as $\pi_{K}^{1}$ and the policy of going down aisle C as $\pi_{K}^{2}$. The two two possible paths that represent these two policies are shown in Fig. \ref{fig:task1_2Figures}. The costs of these different policies can be defined as:
 			\begin{itemize}
 				\item Policy $\pi_{K}^{1}$ : Drive down aisle B and wait for the obstacle to clear. The cost of this scenario is given by the expression in Eq. (\ref{eqn:waitPolicyCostStart}).
 				\begin{equation}
@@ -238,16 +242,8 @@
 				L(\pi_k^2) = L_{IC}+L_{CG}
 				\label{eqn:aisleCPolicyCostStart}
 				\end{equation}
-				\item Policy $\pi_{K}^{3}$ : Choose to go down aisle B and then re-plan down aisle C as soon as the obstacle is observed. The cost of this policy is given in Eq. (\ref{eqn:replanPolicyCostStart})
-				\begin{equation}
-				L(\pi_k^2) = L_{IB_1}+L_{B_1C}+L_{CG}
-				\label{eqn:replanPolicyCostStart}
-				\end{equation}
 			\end{itemize}
 			
-			Comparing the costs for policies $\pi_{K}^{2}$ and $\pi_{K}^{3}$ (given by Eq. (\ref{eqn:aisleCPolicyCostStart}) and Eq. (\ref{eqn:replanPolicyCostStart}) respectively), we can see that they only differ by only a few terms. Whereas $\pi_{K}^{2}$ goes directly down aisle C, $\pi_{K}^{3}$ first attempts to go down aisle B. This results in $\pi_{K}^{2}$ having the cost $L_{IC}$ to get to aisle C while $\pi_{K}^{2}$ has the cost $L_{IB_1}+L_{B_1C}$ to get to aisle C. As $L_{IC}$ is the cost of the best path, $L_{IC} \leq L_{IB_1}+L_{B_1C}$. Therefore we may ignore policy $\pi_{K}^{3}$ as the robot will always pick policy $\pi_{K}^{2}$ over policy $\pi_{K}^{3}$.
-			\\
-			\\
 			As we are concerned with the average case scenario we compare the expected value of the loss function just as we did in \S \ref{sec:policySelectionWhenObstacleIsObserved}. Policy $\pi_{K}^{2}$ will be chosen over policy $\pi_{K}^{1}$ if the expected value of it's cost is lower as shown by Eq. (\ref{eqn:expectationInequality}).
 			
 			\begin{equation}
@@ -266,7 +262,7 @@
 			\label{eqn:expectationInequality1}
 			\end{equation}
 			
-			By substituting the expected value for $T$ found in Eq. (\ref{eqn:waitTimeExpectation}) we obtain a constraint for $\lambda_B$ as shown in Eq. (\ref{eqn:constraintPlanAtStart}). The right hand side of the final inequality in Eq. (\ref{eqn:constraintPlanAtStart}) represents the largest value for $\lambda_B$ for which the robot will decide to go directly down aisle C avoiding aisle B. Once again the suctions for $\lambda_B < 0$ have been ignored. 
+			By substituting the expected value for $T$ found in Eq. (\ref{eqn:waitTimeExpectation}) we obtain a constraint for $\lambda_B$ as shown in Eq. (\ref{eqn:constraintPlanAtStart}). Once again the solutions for $\lambda_B < 0$ have been ignored. 
 			
 			\begin{equation}
 			\begin{split}
@@ -275,11 +271,13 @@
 			\end{split}
 			\label{eqn:constraintPlanAtStart}
 			\end{equation}
+			
+			Therefore from the above inequality we can say that the largest value for $\lambda_B$ for which the robot will decide to go directly down aisle C avoiding aisle B is $ \dfrac{L_W}{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}} $.
 		
 		\subsection{Considering the Probability of the Obstacle Being Present}
 		\label{sec:consideringProbaboilityOfObstacle}
 		
-			In reality, the obstacle would not be present there all the time. This can be taken into account using a probability, say $p_B$ associated with the scenario that the obstacle is present\footnote{This means that the probability that the obstacle is absent can be given by $ (1-p_B) $}. The mean wait time in the case the obstacle is present has been derived in Eq. (\ref{eqn:waitTimeExpectation}). In the case the obstacle isn't present, the robot does not have wait and therefore the mean wait time is 0. By taking a sum of these wait times weighted by their probabilities of occurring we obtain the expected wait time that takes into consideration the probability of the obstacle being present as shown below in Eq. (\ref{eqn:expectedWaitTimeProbability}):
+			In reality, the obstacle would not be present at aisle B all the time. This can be taken into account using a probability, say $p_B$, associated with the scenario that the obstacle is present\footnote{This means that the probability that the obstacle is absent can be given by $ (1-p_B) $}. On incorporating these probabilities, the mean expected wait time weighted by the probability that the obstacle is present would therefore change from what was derived as Eq. (\ref{eqn:waitTimeExpectation}) to $p_B \cdot \mathbb{E}[T]$. On the other hand, in case the obstacle isn't present, the robot does not have wait and therefore the mean wait time is 0. By taking the sum of these expected wait times weighted by their probabilities of occurring, we obtain the expected wait time that takes into consideration the probability of the obstacle being present as shown below in Eq. (\ref{eqn:expectedWaitTimeProbability}):
 			
 			\begin{equation}
 			\begin{split}
@@ -289,26 +287,27 @@
 			\label{eqn:expectedWaitTimeProbability}
 			\end{equation}
 			
-			where, $\mathbb{E}[T]$ is expected time to wait given the obstacle in aisle B exist and it is given by Eq. \ref{eqn:costExpectation1}
-			
-			Given Eq. (\ref{eqn:expectedWaitTimeProbability}) we may reconsider Eq. (\ref{eqn:expectationInequality1}) and substitute this new value for the expected wait time:
+			where, $\mathbb{E}[T]$ is time that the robot is expected to wait given the obstacle is present at aisle B and it is given by Eq. (\ref{eqn:costExpectation1})
+			\\ 
+			\\
+			Eq. (\ref{eqn:expectationInequality}) and Eq. (\ref{eqn:expectedWaitTimeProbability}) represents the inequality based on which the robot would choose the policy to plan straight through aisle C by avoiding aisle B. So for the robot to chose aisle B, the inequality given by Eq. (\ref{eqn:expectationInequality1}) must be reversed and by substituting the new modified value for wait time that incorporates the probability of the obstacle being there given by Eq. (\ref{eqn:expectedWaitTimeProbability}), we get: 
 			
 			\begin{equation}
 			\begin{split}
-			\mathbb{E}_{B}[T] &\geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W} \\
-			\frac{p_B}{\lambda_B} &\geq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}
+			\mathbb{E}_{B}[T] &\leq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W} \\
+			\frac{p_B}{\lambda_B} &\leq \frac{L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}}{L_W}
 			\end{split}
 			\label{eqn:probabilityInequality1}
 			\end{equation}
 			
-			Assuming that the rate parameter $\lambda_B$ is constant, we may arrive at the equation shown in Eq. (\ref{eqn:probabilityConstraint}).
+			Assuming that the rate parameter $\lambda_B$ is constant, we arrive at the equation shown in Eq. (\ref{eqn:probabilityConstraint}).
 			
 			\begin{equation}
-			p_B \geq \frac{\lambda_B\left(L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\right)}{L_W}
+			p_B \leq \frac{\lambda_B\left(L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\right)}{L_W}
 			\label{eqn:probabilityConstraint}
 			\end{equation}
 			
-			It should be noted however that this was the inequality to choose the policy to plan straight through aisle C. Therefore the R.H.S of the inequality in Eq. (\ref{eqn:probabilityConstraint}) represents the value for $p_B$ below which the robot will attempt to drive down aisle B first. 
+			Therefore, for a fixed value of $\lambda_B$ the value of $ p_B $ below which the robot will attempt to drive aisle B first is $ \dfrac{\lambda_B\left(L_{IC}-L_{IB_1}-L_{B_1B}-L_{BC}\right)}{L_W} $.
 		
 		\subsection{Considering Multiple Obstacles}
 		\label{sec:consideringMultipleObstacles}
@@ -481,7 +480,7 @@
 			\label{fig:stdrMap}
 		\end{figure}
 		
-		This section discusses the implementation of the principles discussed in \S \ref{sec:policySelectionInADynamicEnvironment}. The simulations will be carried out using the STDR Simulator running on Robotics Operating System (ROS). The nodes and all supporting scripts will be coded in python. The map in Fig. \ref{fig:stdrMap} shows the map of the environment that will be used. The map consists of 5 aisles. The start cell and goal cell throughout this section will be the same and al discussions will be for this single case. The start cell is in the bottom of aisle A while the goal cell is in the top of aisle E. The map in Fig. (\ref{fig:stdrMap}) implies that there are 4 temporary obstacles on the map. However only one of them will be active throughout the simulations carried out in this section. This is the obstacle in aisle B.
+		This section discusses the implementation of the principles discussed in \S \ref{sec:policySelectionInADynamicEnvironment}. The simulations were carried out using the STDR Simulator running on Robotics Operating System (ROS). The nodes and all supporting scripts were coded in Python. The map in Fig. \ref{fig:stdrMap} shows the map of the environment that was used. The map consists of 5 aisles. The start cell and goal cell throughout this section will be the same and al discussions will be for this single case. The start cell is in the bottom of aisle A while the goal cell is in the top of aisle E. The map in Fig. (\ref{fig:stdrMap}) implies that there are 4 temporary obstacles on the map. However only one of them will be active throughout the simulations carried out in this section. This is the obstacle in aisle B.
 		\\
 		\\
 		As we are concerned with comparing the costs of paths down specific aisles, a function needs to be implemented to allow the planning of a path down a chosen aisle. This is accomplished by the \texttt{\textbf{planPathToGoalViaAisle}} method in the \texttt{\textbf{ReactivePlannerController}} class. The method takes 4 parameters of which 1 is optional:
